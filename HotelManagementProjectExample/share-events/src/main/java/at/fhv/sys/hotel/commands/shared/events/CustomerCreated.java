@@ -1,24 +1,26 @@
 package at.fhv.sys.hotel.commands.shared.events;
 
+import java.time.LocalDate;
+
 public class CustomerCreated {
-    private String userId;
+    private String customerId;
     private String name;
     private String email;
     private String address;
-    private String birthDate;
+    private LocalDate birthDate;
 
     public CustomerCreated() {}
 
-    public CustomerCreated(String userId, String name, String email, String address, String birthDate) {
-        this.userId = userId;
+    public CustomerCreated(String customerId, String name, String email, String address, LocalDate birthDate) {
+        this.customerId = customerId;
         this.name = name;
         this.email = email;
         this.address = address;
         this.birthDate = birthDate;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getCustomerId() {
+        return customerId;
     }
 
     public String getName() {
@@ -33,12 +35,12 @@ public class CustomerCreated {
         return address;
     }
 
-    public String getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     public void setName(String name) {
@@ -53,12 +55,18 @@ public class CustomerCreated {
         this.address = address;
     }
 
-    public void setBirthDate(String birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
     @Override
     public String toString() {
-        return "CustomerCreated{" + "userId='" + userId + '\'' + ", name='" + name + '\'' + ", email='" + email + '\'' + ", address='" + address + '\'' + ", birthDate='" + birthDate + '\'' + '}';
+        return "CustomerCreated{" +
+                "customerId='" + customerId + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
+                ", birthDate=" + birthDate +
+                '}';
     }
 }

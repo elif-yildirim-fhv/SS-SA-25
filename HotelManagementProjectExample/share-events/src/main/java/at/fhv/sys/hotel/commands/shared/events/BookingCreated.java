@@ -5,18 +5,20 @@ import java.time.LocalDate;
 public class BookingCreated {
     private String bookingId;
     private String roomId;
-    private String userId;
+    private String customerId;
     private LocalDate startDate;
     private LocalDate endDate;
+    private double totalPrice;
 
     public BookingCreated() {}
 
-    public BookingCreated(String bookingId, String roomId, String userId, LocalDate startDate, LocalDate endDate) {
+    public BookingCreated(String bookingId, String roomId, String customerId, LocalDate startDate, LocalDate endDate, double totalPrice) {
         this.bookingId = bookingId;
         this.roomId = roomId;
-        this.userId = userId;
+        this.customerId = customerId;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.totalPrice = totalPrice;
     }
 
     public String getBookingId() {
@@ -27,8 +29,8 @@ public class BookingCreated {
         return roomId;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getCustomerId() {
+        return customerId;
     }
 
     public LocalDate getStartDate() {
@@ -39,6 +41,10 @@ public class BookingCreated {
         return endDate;
     }
 
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
     public void setBookingId(String bookingId) {
         this.bookingId = bookingId;
     }
@@ -47,8 +53,8 @@ public class BookingCreated {
         this.roomId = roomId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     public void setStartDate(LocalDate startDate) {
@@ -59,14 +65,19 @@ public class BookingCreated {
         this.endDate = endDate;
     }
 
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
     @Override
     public String toString() {
         return "BookingCreated{" +
                 "bookingId='" + bookingId + '\'' +
                 ", roomId='" + roomId + '\'' +
-                ", userId='" + userId + '\'' +
+                ", customerId='" + customerId + '\'' +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
+                ", totalPrice=" + totalPrice +
                 '}';
     }
 } 

@@ -1,6 +1,7 @@
 package at.fhv.sys.hotel.projection;
 
 import at.fhv.sys.hotel.commands.shared.events.CustomerCreated;
+import at.fhv.sys.hotel.commands.shared.events.CustomerUpdated;
 import at.fhv.sys.hotel.models.CustomerQueryModel;
 import at.fhv.sys.hotel.models.CustomerQueryPanacheModel;
 import at.fhv.sys.hotel.service.CustomerService;
@@ -21,12 +22,20 @@ public class CustomerProjection {
 
     public void processCustomerCreatedEvent(CustomerCreated customerCreatedEvent) {
         Logger.getAnonymousLogger().info("Processing event: " + customerCreatedEvent);
-        customerService.createCustomer(new CustomerQueryModel(customerCreatedEvent.getUserId(), customerCreatedEvent.getEmail()));
+        customerService.createCustomer(new CustomerQueryModel(customerCreatedEvent.getCustomerId(), customerCreatedEvent.getName(), customerCreatedEvent.getEmail(), customerCreatedEvent.getAddress(), customerCreatedEvent.getBirthDate()));
 
         CustomerQueryPanacheModel customer = new CustomerQueryPanacheModel();
-        customer.userId = customerCreatedEvent.getUserId();
+        customer.customerId = customerCreatedEvent.getCustomerId();
+        customer.name = customerCreatedEvent.getName();
         customer.email = customerCreatedEvent.getEmail();
+        customer.address = customerCreatedEvent.getAddress();
+        customer.birthDate = customerCreatedEvent.getBirthDate();
         customerServicePanache.createCustomer(customer);
 
+    }
+
+    public void processCustomerUpdateEvent(CustomerUpdated customerUpdatedEvent) {
+        Logger.getAnonymousLogger().info("Processing event: " + customerUpdatedEvent);
+        customerServicePanache.updateCustomer(customer);
     }
 }

@@ -23,4 +23,7 @@ public class CustomerService {
     public void createCustomer(CustomerQueryModel customer) {
         entityManager.persist(customer);
     }
+
+    @Transactional
+    public void updateCustomer(CustomerQueryModel customer) {entityManager.merge(customer);}
 }

@@ -1,15 +1,9 @@
 package at.fhv.sys.hotel.client;
 
-import at.fhv.sys.hotel.commands.shared.events.CustomerCreated;
-import at.fhv.sys.hotel.commands.shared.events.CustomerDeleted;
-import at.fhv.sys.hotel.commands.shared.events.CustomerUpdated;
-import at.fhv.sys.hotel.commands.shared.events.BookingCreated;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Produces;
+import at.fhv.sys.hotel.commands.shared.events.*;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-import jakarta.ws.rs.Path;
 
 @RegisterRestClient(configKey="hotel-eventbus-api-client")
 @Path("/api")
@@ -38,4 +32,28 @@ public interface EventBusClient {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     BookingCreated processBookingCreatedEvent(BookingCreated event);
+
+    @POST
+    @Path("/bookingCancelled")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    BookingCancelled processBookingCancelledEvent(BookingCancelled event);
+
+    @POST
+    @Path("/paymentReceived")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    PaymentReceived processPaymentReceivedEvent(PaymentReceived event);
+
+    @POST
+    @Path("/roomCreated")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    RoomCreated processRoomCreatedEvent(RoomCreated event);
+
+    @POST
+    @Path("/roomUpdated")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    RoomUpdated processRoomUpdatedEvent(RoomUpdated event);
 }

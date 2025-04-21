@@ -2,38 +2,60 @@ package at.fhv.sys.hotel.controller;
 
 import at.fhv.sys.hotel.commands.CreateCustomerCommand;
 import at.fhv.sys.hotel.commands.CustomerAggregate;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
-@Path("/api")
+import java.time.LocalDate;
+
+@Path("/api/customers")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class CustomerCommandController {
 
+    @Inject
     CustomerAggregate customerAggregate;
 
-    public CustomerCommandController(CustomerAggregate customerAggregate) {
-        this.customerAggregate = customerAggregate;
+    @POST
+    @Path("/create")
+    public Response createCustomer(
+            @QueryParam("name") String name,
+            @QueryParam("email") String email,
+            @QueryParam("address") String address,
+            @QueryParam("birthDate") String birthDate) {
+        try {
+            LocalDate parsedBirthDate = LocalDate.parse(birthDate);
+            String customerId = customerAggregate.handle(new CreateCustomerCommand(
+                    null,
+                    name,
+                    email,
+                    address,
+                    parsedBirthDate
+            ));
+            return Response.ok(customerId).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .build();
+        }
     }
 
-    @POST
-    @Path("/createCustomer")
-    public String createCustomer(@QueryParam("customerId") String customerId, @QueryParam("name") String name, @QueryParam("email") String email) {
-        return customerAggregate.handle(new CreateCustomerCommand(customerId, name, email));
-
-    }
-
-    @POST
-    @Path("/{customerId}/update")
-    public String updateCustomer(@PathParam("customerId") String customerId, @QueryParam("email") String email) {
-        // TBD: process customer
-        return "Customer updated";
-    }
-
-    @POST
-    @Path("/{customerId}/delete")
-    public String deleteCustomer(@PathParam("customerId") String customerId) {
-        // TBD: delete customer
-        return "Customer deleted";
+    @PUT
+    @Path("/{customerId}")
+    public Response updateCustomer(
+            @PathParam("customerId") String customerId,
+            @QueryParam("name") String name,
+            @QueryParam("email") String email,
+            @QueryParam("address") String address,
+            @QueryParam("birthDate") String birthDate) {
+        try {
+            // TODO: Implement update command
+            return Response.ok("Customer updated successfully").build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .build();
+        }
     }
 }

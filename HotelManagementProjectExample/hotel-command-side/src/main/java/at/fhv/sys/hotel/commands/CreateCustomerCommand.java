@@ -1,4 +1,6 @@
 package at.fhv.sys.hotel.commands;
 
-public record CreateCustomerCommand(String userId, String name, String email, String address, String birthDate) {
+import java.time.LocalDate;
+
+public record CreateCustomerCommand(String customerId, String name, String email, String address, LocalDate birthDate) {
 }
