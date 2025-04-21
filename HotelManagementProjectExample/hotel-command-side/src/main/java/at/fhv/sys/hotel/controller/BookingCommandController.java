@@ -26,15 +26,26 @@ public class BookingCommandController {
     @APIResponse(responseCode = "200", description = "Booking created successfully")
     @APIResponse(responseCode = "400", description = "Invalid booking data")
     public Response createBooking(@QueryParam("roomId") String roomId,
-                                @QueryParam("userId") String userId,
+                                @QueryParam("customerId") String customerId,
                                 @QueryParam("startDate") String startDate,
                                 @QueryParam("endDate") String endDate) {
         try {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
+            
             String bookingId = bookingAggregate.handle(
-                new BookRoomCommand(roomId, userId, start, end)
+                new BookRoomCommand(
+                    null,
+                    roomId,
+                    customerId,
+                    start,
+                    end,
+                    0.0,
+                    false,
+                    false
+                )
             );
+            
             return Response.ok("Booking created with ID: " + bookingId).build();
         } catch (DateTimeParseException e) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -44,9 +55,12 @@ public class BookingCommandController {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Error creating booking: " + e.getMessage())
                     .build();
+        } catch (IllegalStateException e) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("Error creating booking: " + e.getMessage())
+                    .build();
         }
     }
-
 
     @POST
     @Path("/{bookingId}/cancel")
@@ -57,9 +71,13 @@ public class BookingCommandController {
         try {
             bookingAggregate.handle(new CancelBookingCommand(bookingId));
             return Response.ok("Booking cancelled successfully").build();
-        } catch (NotFoundException e) {
+        } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.NOT_FOUND)
-                    .entity("Booking not found")
+                    .entity("Booking not found: " + e.getMessage())
+                    .build();
+        } catch (IllegalStateException e) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("Cannot cancel booking: " + e.getMessage())
                     .build();
         }
     }
