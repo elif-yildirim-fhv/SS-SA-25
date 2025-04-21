@@ -4,6 +4,7 @@ import at.fhv.sys.eventbus.services.EventProcessingService;
 import at.fhv.sys.hotel.commands.shared.events.BookingCreated;
 import at.fhv.sys.hotel.commands.shared.events.CustomerCreated;
 import at.fhv.sys.hotel.commands.shared.events.BookingCancelled;
+import at.fhv.sys.hotel.commands.shared.events.PaymentReceived;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -50,6 +51,16 @@ public class EventsController {
     public Response bookingCancelled(BookingCancelled event) {
         Logger.getAnonymousLogger().info("Received event: " + event);
         eventStoreService.processEvent("booking-" + event.getBookingId(), event);
+        return Response.ok(event).build();
+    }
+
+    @POST
+    @Path("/paymentCreated")
+    @Operation(summary = "Process payment received event")
+    @APIResponse(responseCode = "200", description = "Event processed successfully")
+    public Response paymentCreated(PaymentReceived event) {
+        Logger.getAnonymousLogger().info("Received event: " + event);
+        eventStoreService.processEvent("payment-" + event.getBookingId(), event);
         return Response.ok(event).build();
     }
 }

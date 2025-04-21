@@ -26,6 +26,8 @@ public class EventProcessingService {
             queryClient.forwardRoomBookedEvent((BookingCreated) eventObject);
         } else if (eventObject instanceof BookingCancelled) {
             queryClient.forwardBookingCancelledEvent((BookingCancelled) eventObject);
+        } else if (eventObject instanceof PaymentReceived) {
+            queryClient.processPaymentCreatedEvent((PaymentReceived) eventObject);
         } else {
             LOG.warning("Unknown event type: " + eventObject.getClass().getName());
         }
