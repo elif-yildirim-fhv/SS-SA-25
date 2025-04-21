@@ -9,16 +9,20 @@ public class BookingCreated {
     private LocalDate startDate;
     private LocalDate endDate;
     private double totalPrice;
+    private boolean isPaid;
+    private boolean isCancelled;
 
     public BookingCreated() {}
 
-    public BookingCreated(String bookingId, String roomId, String customerId, LocalDate startDate, LocalDate endDate, double totalPrice) {
+    public BookingCreated(String bookingId, String roomId, String customerId, LocalDate startDate, LocalDate endDate, double totalPrice, boolean isPaid, boolean isCancelled) {
         this.bookingId = bookingId;
         this.roomId = roomId;
         this.customerId = customerId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.totalPrice = totalPrice;
+        this.isPaid = isPaid;
+        this.isCancelled = isCancelled;
     }
 
     public String getBookingId() {
@@ -45,6 +49,14 @@ public class BookingCreated {
         return totalPrice;
     }
 
+    public boolean isPaid() {
+        return isPaid;
+    }
+
+    public boolean isCancelled() {
+        return isCancelled;
+    }
+
     public void setBookingId(String bookingId) {
         this.bookingId = bookingId;
     }
@@ -69,6 +81,14 @@ public class BookingCreated {
         this.totalPrice = totalPrice;
     }
 
+    public void setPaid(boolean paid) {
+        isPaid = paid;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        isCancelled = cancelled;
+    }
+
     @Override
     public String toString() {
         return "BookingCreated{" +
@@ -78,6 +98,8 @@ public class BookingCreated {
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", totalPrice=" + totalPrice +
+                ", isPaid=" + isPaid +
+                ", isCancelled=" + isCancelled +
                 '}';
     }
 } 

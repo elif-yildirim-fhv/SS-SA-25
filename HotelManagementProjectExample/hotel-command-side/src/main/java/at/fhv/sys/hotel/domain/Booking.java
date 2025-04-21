@@ -106,24 +106,4 @@ public class Booking {
         this.totalPrice = pricePerNight * nights;
     }
 
-    public void updateDates(LocalDate newStartDate, LocalDate newEndDate) {
-        if (isCancelled) {
-            throw new IllegalStateException("Cannot update dates for cancelled booking");
-        }
-        if (isPaid) {
-            throw new IllegalStateException("Cannot update dates for paid booking");
-        }
-        if (newStartDate == null || newEndDate == null) {
-            throw new IllegalArgumentException("Dates cannot be null");
-        }
-        if (newEndDate.isBefore(newStartDate)) {
-            throw new IllegalArgumentException("End date must be after start date");
-        }
-        if (newStartDate.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Cannot book in the past");
-        }
-
-        this.startDate = newStartDate;
-        this.endDate = newEndDate;
-    }
 }

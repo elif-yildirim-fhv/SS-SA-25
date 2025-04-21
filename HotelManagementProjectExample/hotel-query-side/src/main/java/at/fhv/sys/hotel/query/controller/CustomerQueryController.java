@@ -1,6 +1,7 @@
 package at.fhv.sys.hotel.query.controller;
 
 import at.fhv.sys.hotel.commands.shared.events.CustomerCreated;
+import at.fhv.sys.hotel.commands.shared.events.CustomerUpdated;
 import at.fhv.sys.hotel.projection.CustomerProjection;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -24,6 +25,14 @@ public class CustomerQueryController {
     public Response customerCreated(CustomerCreated event) {
         Logger.getAnonymousLogger().info("Received event: " + event);
         customerProjection.processCustomerCreatedEvent(event);
+        return Response.ok(event).build();
+    }
+
+    @POST
+    @Path("/customerUpdated")
+    public Response customerUpdated(CustomerUpdated event) {
+        Logger.getAnonymousLogger().info("Received event: " + event);
+        customerProjection.processCustomerUpdateEvent(event);
         return Response.ok(event).build();
     }
 }

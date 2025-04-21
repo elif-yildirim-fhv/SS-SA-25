@@ -22,12 +22,7 @@ public interface QueryClient {
     void forwardCustomerUpdatedEvent(CustomerUpdated event);
 
     @POST
-    @Path("/customerDeleted")
-    @Consumes(MediaType.APPLICATION_JSON)
-    void forwardCustomerDeletedEvent(CustomerDeleted event);
-
-    @POST
-    @Path("/roomBooked")
+    @Path("/bookingCreated")
     @Consumes(MediaType.APPLICATION_JSON)
     void forwardRoomBookedEvent(BookingCreated event);
 

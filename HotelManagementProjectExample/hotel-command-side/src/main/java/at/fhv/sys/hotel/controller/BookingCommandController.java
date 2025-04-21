@@ -28,8 +28,7 @@ public class BookingCommandController {
     public Response createBooking(@QueryParam("roomId") String roomId,
                                 @QueryParam("userId") String userId,
                                 @QueryParam("startDate") String startDate,
-                                @QueryParam("endDate") String endDate,
-                                @QueryParam("totalPrice") double totalPrice) {
+                                @QueryParam("endDate") String endDate) {
         try {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
