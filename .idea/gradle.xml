@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/HotelManagementProjectExample/eventbus" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/HotelManagementProjectExample/eventbus" />
+            <option value="$PROJECT_DIR$/HotelManagementProjectExample/share-events" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/HotelManagementProjectExample/hotel-command-side" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/HotelManagementProjectExample/hotel-command-side" />
+            <option value="$PROJECT_DIR$/HotelManagementProjectExample/share-events" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/HotelManagementProjectExample/hotel-query-side" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/HotelManagementProjectExample/hotel-query-side" />
+            <option value="$PROJECT_DIR$/HotelManagementProjectExample/share-events" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

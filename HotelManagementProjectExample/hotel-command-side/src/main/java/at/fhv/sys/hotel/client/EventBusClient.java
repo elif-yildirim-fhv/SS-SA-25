@@ -56,4 +56,11 @@ public interface EventBusClient {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     RoomUpdated processRoomUpdatedEvent(RoomUpdated event);
+
+    @POST
+    @Path("/paymentCreated")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    PaymentReceived processPaymentCreatedEvent(PaymentReceived event);
+
 }

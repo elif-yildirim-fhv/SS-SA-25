@@ -3,7 +3,6 @@ package at.fhv.sys.eventbus.controller;
 import at.fhv.sys.eventbus.services.EventProcessingService;
 import at.fhv.sys.hotel.commands.shared.events.BookingCreated;
 import at.fhv.sys.hotel.commands.shared.events.CustomerCreated;
-import at.fhv.sys.hotel.commands.shared.events.RoomBooked;
 import at.fhv.sys.hotel.commands.shared.events.BookingCancelled;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
