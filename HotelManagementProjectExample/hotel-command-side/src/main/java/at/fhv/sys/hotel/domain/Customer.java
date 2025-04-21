@@ -19,9 +19,6 @@ public class Customer {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("Email is required");
         }
-        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            throw new IllegalArgumentException("Invalid email format");
-        }
         if (address == null || address.trim().isEmpty()) {
             throw new IllegalArgumentException("Address is required");
         }
@@ -51,9 +48,6 @@ public class Customer {
             this.name = name.trim();
         }
         if (email != null && !email.trim().isEmpty()) {
-            if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-                throw new IllegalArgumentException("Invalid email format");
-            }
             this.email = email.trim();
         }
         if (address != null && !address.trim().isEmpty()) {

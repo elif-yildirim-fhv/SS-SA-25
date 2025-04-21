@@ -1,37 +1,33 @@
 package at.fhv.sys.hotel.domain;
 
+
+
+
 public class Room {
-    private String id;
+    private String roomId;
     private String roomNumber;
     private double price;
     private int maxCapacity;
     private boolean isAvailable;
-    private RoomType roomType;
+    private String roomType;
 
-    public Room(String roomNumber, double price, int maxCapacity, RoomType roomType) {
-        if (roomNumber == null || roomNumber.isEmpty()) {
-            throw new IllegalArgumentException("Room number is required");
-        }
-        if (price <= 0) {
-            throw new IllegalArgumentException("Price must be positive");
-        }
-        if (maxCapacity <= 0) {
-            throw new IllegalArgumentException("Capacity must be positive");
-        }
-        if (roomType == null) {
-            throw new IllegalArgumentException("Room type is required");
-        }
+    public Room() {}
 
-        this.id = java.util.UUID.randomUUID().toString();
+    public Room(String roomId, String roomNumber, double price, int maxCapacity, boolean isAvailable, String roomType) {
+       this.roomId = java.util.UUID.randomUUID().toString();
         this.roomNumber = roomNumber;
         this.price = price;
         this.maxCapacity = maxCapacity;
-        this.isAvailable = true;
+        this.isAvailable = isAvailable;
         this.roomType = roomType;
     }
 
+    public Room( String roomNumber, double price, int maxCapacity, String roomType) {
+        this(null, roomNumber,price, maxCapacity, true, roomType);
+    }
+
     public String getId() {
-        return id;
+        return roomId;
     }
 
     public String getRoomNumber() {
@@ -68,21 +64,11 @@ public class Room {
         isAvailable = available;
     }
 
-    public RoomType getRoomType() {
+    public String getRoomType() {
         return roomType;
     }
 
-    public void setRoomType(RoomType roomType) {
-        if (roomType == null) {
-            throw new IllegalArgumentException("Room type is required");
-        }
+    public void setRoomType(String roomType) {
         this.roomType = roomType;
-    }
-
-    public enum RoomType {
-        SINGLE,
-        DOUBLE,
-        SUITE,
-        FAMILY
     }
 }

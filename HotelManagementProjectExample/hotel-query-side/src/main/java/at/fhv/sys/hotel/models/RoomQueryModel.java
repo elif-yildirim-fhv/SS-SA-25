@@ -1,12 +1,10 @@
 package at.fhv.sys.hotel.models;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 @Entity
-public class RoomQueryModel{
-
+public class RoomQueryModel {
     @Id
     private String roomId;
     private String roomNumber;
@@ -26,55 +24,48 @@ public class RoomQueryModel{
         this.roomType = roomType;
     }
 
-    public enum RoomType {
-        SINGLE,
-        DOUBLE,
-        SUITE,
-        FAMILY
-    }
-
     public String getRoomId() {
         return roomId;
-    }
-
-    public String getRoomNumber() {
-        return roomNumber;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public int getMaxCapacity() {
-        return maxCapacity;
-    }
-
-    public boolean isAvailable() {
-        return isAvailable;
-    }
-
-    public String getRoomType() {
-        return roomType;
     }
 
     public void setRoomId(String roomId) {
         this.roomId = roomId;
     }
 
+    public String getRoomNumber() {
+        return roomNumber;
+    }
+
     public void setRoomNumber(String roomNumber) {
         this.roomNumber = roomNumber;
+    }
+
+    public double getPrice() {
+        return price;
     }
 
     public void setPrice(double price) {
         this.price = price;
     }
 
+    public int getMaxCapacity() {
+        return maxCapacity;
+    }
+
     public void setMaxCapacity(int maxCapacity) {
         this.maxCapacity = maxCapacity;
     }
 
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
     public void setAvailable(boolean available) {
         isAvailable = available;
+    }
+
+    public String getRoomType() {
+        return roomType;
     }
 
     public void setRoomType(String roomType) {
