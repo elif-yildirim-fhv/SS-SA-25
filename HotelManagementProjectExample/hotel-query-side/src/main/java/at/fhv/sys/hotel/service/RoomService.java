@@ -1,6 +1,7 @@
 package at.fhv.sys.hotel.service;
 
 import at.fhv.sys.hotel.models.RoomQueryModel;
+import at.fhv.sys.hotel.models.RoomQueryPanacheModel;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -18,20 +19,20 @@ public class RoomService {
     }
 
     @Transactional
-    public void createRoom(RoomQueryModel room) {
+    public void createRoom(RoomQueryPanacheModel room) {
         entityManager.persist(room);
     }
 
     @Transactional
-    public void updateRoom(RoomQueryModel room) {
-        RoomQueryModel existing = entityManager.find(RoomQueryModel.class, room.id);
-        if (existing != null) {
-            existing.roomNumber = room.roomNumber;
-            existing.price = room.price;
-            existing.maxCapacity = room.maxCapacity;
-            existing.roomType = room.roomType;
-            existing.isAvailable = room.isAvailable;
-            entityManager.merge(existing);
+    public void updateRoom(RoomQueryPanacheModel room) {
+        RoomQueryPanacheModel existingRoom = entityManager.find(RoomQueryPanacheModel.class, room.id);
+        if (existingRoom != null) {
+            existingRoom.roomNumber = room.roomNumber;
+            existingRoom.price = room.price;
+            existingRoom.maxCapacity = room.maxCapacity;
+            existingRoom.roomType = room.roomType;
+            existingRoom.isAvailable = room.isAvailable;
+            entityManager.merge(existingRoom);
         }
     }
 
