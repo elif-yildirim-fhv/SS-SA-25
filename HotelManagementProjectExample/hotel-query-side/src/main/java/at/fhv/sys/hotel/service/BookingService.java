@@ -1,7 +1,10 @@
 package at.fhv.sys.hotel.service;
 
 import at.fhv.sys.hotel.models.BookingQueryModel;
+import at.fhv.sys.hotel.models.BookingQueryPanacheModel;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
@@ -9,29 +12,51 @@ import java.util.List;
 @ApplicationScoped
 public class BookingService {
 
+    @PersistenceContext
+    EntityManager entityManager;
+
     @Transactional
-    public void createBooking(BookingQueryModel booking) {
-        booking.persist();
+    public void createBooking(BookingQueryPanacheModel booking) {
+        entityManager.persist(booking);
+    }
+
+    @Transactional
+    public void updateBooking(BookingQueryPanacheModel booking) {
+        BookingQueryPanacheModel existingBooking = getBookingById(booking.bookingId);
+        if (existingBooking != null) {
+            existingBooking.isPaid = booking.isPaid;
+            existingBooking.isCancelled = booking.isCancelled;
+            entityManager.merge(existingBooking);
+        }
     }
 
     @Transactional
     public void cancelBooking(String bookingId) {
-        BookingQueryModel booking = BookingQueryModel.find("bookingId", bookingId).firstResult();
+        BookingQueryPanacheModel booking = getBookingById(bookingId);
         if (booking != null) {
             booking.isCancelled = true;
-            booking.persist();
+            entityManager.merge(booking);
         }
     }
 
     public List<BookingQueryModel> getAllBookings() {
-        return BookingQueryModel.listAll();
+        return entityManager.createQuery("SELECT r FROM BookingQueryModel r", BookingQueryModel.class).getResultList();
     }
 
-    public List<BookingQueryModel> getBookingsByDateRange(LocalDate start, LocalDate end) {
-        return BookingQueryModel.find("startDate >= ?1 and endDate <= ?2", start, end).list();
+    public BookingQueryPanacheModel getBookingById(String bookingId) {
+        return entityManager.createQuery(
+            "SELECT b FROM BookingQueryModel b WHERE b.bookingId = :bookingId",
+            BookingQueryPanacheModel.class
+        )
+        .setParameter("bookingId", bookingId)
+        .getSingleResult();
     }
 
-    public BookingQueryModel getBookingById(String bookingId) {
-        return BookingQueryModel.find("bookingId", bookingId).firstResult();
+    public List<BookingQueryPanacheModel> getAvailableBookings() {
+        return entityManager.createQuery(
+            "SELECT b FROM BookingQueryPanacheModel b WHERE b.isCancelled = false",
+            BookingQueryPanacheModel.class
+        )
+        .getResultList();
     }
 } 

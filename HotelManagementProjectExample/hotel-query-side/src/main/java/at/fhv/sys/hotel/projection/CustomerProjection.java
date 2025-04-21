@@ -9,6 +9,7 @@ import at.fhv.sys.hotel.service.CustomerServicePanache;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+
 import java.util.logging.Logger;
 
 @ApplicationScoped
@@ -34,8 +35,26 @@ public class CustomerProjection {
 
     }
 
-    public void processCustomerUpdateEvent(CustomerUpdated customerUpdatedEvent) {
-        Logger.getAnonymousLogger().info("Processing event: " + customerUpdatedEvent);
-        customerServicePanache.updateCustomer(customer);
+    public void processCustomerUpdateEvent(CustomerUpdated event) {
+        Logger.getAnonymousLogger().info("Processing CustomerUpdated event: " + event);
+        CustomerQueryModel customerModel = new CustomerQueryModel(
+                    event.getCustomerId(),
+                    event.getName(),
+                    event.getEmail(),
+                    event.getAddress(),
+                    event.getBirthDate());
+
+            customerService.updateCustomer(customerModel);
+
+            CustomerQueryPanacheModel customerPanache = new CustomerQueryPanacheModel();
+            customerPanache.customerId = event.getCustomerId();
+            customerPanache.name = event.getName();
+            customerPanache.email = event.getEmail();
+            customerPanache.address = event.getAddress();
+            customerPanache.birthDate = event.getBirthDate();
+            customerServicePanache.updateCustomer(customerPanache);
+
     }
+
+
 }

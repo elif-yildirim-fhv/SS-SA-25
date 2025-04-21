@@ -1,6 +1,8 @@
 package at.fhv.sys.hotel.service;
 
+import at.fhv.sys.hotel.models.BookingQueryPanacheModel;
 import at.fhv.sys.hotel.models.PaymentQueryModel;
+import at.fhv.sys.hotel.models.PaymentQueryPanacheModel;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -10,35 +12,38 @@ import java.util.List;
 public class PaymentService {
 
     @Transactional
-    public void createPayment(PaymentQueryModel payment) {
+    public void createPayment(PaymentQueryPanacheModel payment) {
         payment.persist();
     }
 
-    public List<PaymentQueryModel> getAllPayments() {
-        return PaymentQueryModel.listAll();
+    public List<PaymentQueryPanacheModel> getAllPayments() {
+        return PaymentQueryPanacheModel.listAll();
     }
 
-    public PaymentQueryModel getPaymentById(String paymentId) {
-        return PaymentQueryModel.find("paymentId", paymentId).firstResult();
+    public PaymentQueryPanacheModel getPaymentById(String paymentId) {
+        return PaymentQueryPanacheModel.find("paymentId", paymentId).firstResult();
     }
 
-    public List<PaymentQueryModel> getPaymentsByBookingId(String bookingId) {
-        return PaymentQueryModel.find("bookingId", bookingId).list();
+    public List<PaymentQueryPanacheModel> getPaymentsByBookingId(String bookingId) {
+        return PaymentQueryPanacheModel.find("bookingId", bookingId).list();
     }
 
-    public List<PaymentQueryModel> getPaymentsByDateRange(LocalDateTime start, LocalDateTime end) {
-        return PaymentQueryModel.find("paymentDate >= ?1 and paymentDate <= ?2", start, end).list();
+    public List<PaymentQueryPanacheModel> getPaymentsByDateRange(LocalDateTime start, LocalDateTime end) {
+        return PaymentQueryPanacheModel.find("paymentDate >= ?1 and paymentDate <= ?2", start, end).list();
     }
 
-    public void updatePayment(PaymentQueryModel payment) {
+    @Transactional
+    public void updatePayment(PaymentQueryPanacheModel payment) {
         payment.persist();
     }
 
+    @Transactional
     public void deletePayment(String paymentId) {
-        PaymentQueryModel.find("paymentId", paymentId).firstResult().delete();
+        PaymentQueryPanacheModel.find("paymentId", paymentId).firstResult().delete();
     }
 
+    @Transactional
     public boolean paymentExists(String paymentId) {
-        return PaymentQueryModel.find("paymentId", paymentId).count() > 0;
+        return PaymentQueryPanacheModel.find("paymentId", paymentId).count() > 0;
     }
 } 

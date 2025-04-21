@@ -22,10 +22,8 @@ public class EventProcessingService {
             queryClient.forwardCustomerCreatedEvent((CustomerCreated) eventObject);
         } else if (eventObject instanceof CustomerUpdated) {
             queryClient.forwardCustomerUpdatedEvent((CustomerUpdated) eventObject);
-        } else if (eventObject instanceof CustomerDeleted) {
-            queryClient.forwardCustomerDeletedEvent((CustomerDeleted) eventObject);
-        } else if (eventObject instanceof RoomBooked) {
-            queryClient.forwardRoomBookedEvent((RoomBooked) eventObject);
+        } else if (eventObject instanceof BookingCreated) {
+            queryClient.forwardRoomBookedEvent((BookingCreated) eventObject);
         } else if (eventObject instanceof BookingCancelled) {
             queryClient.forwardBookingCancelledEvent((BookingCancelled) eventObject);
         } else {

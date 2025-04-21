@@ -46,6 +46,11 @@ public class BookingAggregate {
             );
 
             booking.calculateTotalPrice(room.getPrice());
+            booking.setPaid(command.isPaid());
+            if (command.isCancelled()) {
+                booking.cancel();
+            }
+            
             bookings.put(booking.getId(), booking);
             room.setAvailable(false);
 
@@ -55,16 +60,21 @@ public class BookingAggregate {
                 booking.getCustomerId(),
                 booking.getStartDate(),
                 booking.getEndDate(),
-                booking.getTotalPrice()
+                booking.getTotalPrice(),
+                booking.isPaid(),
+                booking.isCancelled()
             );
 
             eventClient.processBookingCreatedEvent(event);
             LOGGER.info("Booking created successfully with ID: " + booking.getId());
 
             return booking.getId();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             LOGGER.severe("Failed to create booking: " + e.getMessage());
             throw e;
+        } catch (Exception e) {
+            LOGGER.severe("Unexpected error while creating booking: " + e.getMessage());
+            throw new RuntimeException("Failed to create booking", e);
         }
     }
 

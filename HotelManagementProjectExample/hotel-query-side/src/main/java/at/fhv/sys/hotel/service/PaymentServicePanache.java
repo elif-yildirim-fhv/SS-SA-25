@@ -42,7 +42,14 @@ public class PaymentServicePanache {
 
     @Transactional
     public void updatePayment(PaymentQueryPanacheModel payment) {
-        payment.persist();
+        PaymentQueryPanacheModel existingPayment = PaymentQueryPanacheModel.findByPaymentId(payment.paymentId);
+        if (payment != null) {
+            existingPayment.paymentMethod = payment.paymentMethod;
+            existingPayment.paymentDate = payment.paymentDate;
+            existingPayment.amount = payment.amount;
+            existingPayment.isCompleted = payment.isCompleted;
+            existingPayment.persist();
+        }
     }
 
     @Transactional

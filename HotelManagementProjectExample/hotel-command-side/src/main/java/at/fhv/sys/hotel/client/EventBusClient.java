@@ -22,12 +22,6 @@ public interface EventBusClient {
     CustomerUpdated processCustomerUpdatedEvent(CustomerUpdated event);
 
     @POST
-    @Path("/customerDeleted")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    CustomerDeleted processCustomerDeletedEvent(CustomerDeleted event);
-
-    @POST
     @Path("/bookingCreated")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -44,23 +38,5 @@ public interface EventBusClient {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     PaymentReceived processPaymentReceivedEvent(PaymentReceived event);
-
-    @POST
-    @Path("/roomCreated")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    RoomCreated processRoomCreatedEvent(RoomCreated event);
-
-    @POST
-    @Path("/roomUpdated")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    RoomUpdated processRoomUpdatedEvent(RoomUpdated event);
-
-    @POST
-    @Path("/paymentCreated")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    PaymentReceived processPaymentCreatedEvent(PaymentReceived event);
 
 }

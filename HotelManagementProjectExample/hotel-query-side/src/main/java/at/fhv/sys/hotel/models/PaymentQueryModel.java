@@ -2,16 +2,19 @@ package at.fhv.sys.hotel.models;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
 import java.time.LocalDateTime;
 
 @Entity
-public class PaymentQueryModel extends PanacheEntity {
-    public String paymentId;
-    public String bookingId;
-    public double amount;
-    public LocalDateTime paymentDate;
-    public String paymentMethod;
-    public boolean isCompleted;
+public class PaymentQueryModel{
+    @Id
+    private String paymentId;
+    private String bookingId;
+    private double amount;
+    private LocalDateTime paymentDate;
+    private String paymentMethod;
+    private boolean isCompleted;
 
     public PaymentQueryModel() {}
 
