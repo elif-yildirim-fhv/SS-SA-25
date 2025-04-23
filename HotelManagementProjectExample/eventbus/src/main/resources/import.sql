@@ -6,7 +6,7 @@ CREATE TABLE event_schema.event_store (
                                           stream VARCHAR(255),
                                           eventType VARCHAR(255),
                                           timestamp TIMESTAMP,
-                                          eventData VARCHAR(255)
+                                          eventData TEXT
 );
 
 
