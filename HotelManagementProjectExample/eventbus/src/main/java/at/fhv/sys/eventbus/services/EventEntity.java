@@ -8,7 +8,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "event_store")
+@Table(name = "event")
 public class EventEntity {
 	@Id
 	private String id;

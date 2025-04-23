@@ -8,6 +8,14 @@ CREATE TABLE event_schema.event_store (
                                           timestamp TIMESTAMP,
                                           eventData TEXT
 );
+CREATE TABLE event_schema.event(
+                                   id SERIAL PRIMARY KEY,
+                                   stream VARCHAR(255),
+                                   eventType VARCHAR(255),
+                                   timestamp TIMESTAMP,
+                                   eventData TEXT
+);
+
 
 
 
