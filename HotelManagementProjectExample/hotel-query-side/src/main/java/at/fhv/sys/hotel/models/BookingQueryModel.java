@@ -1,22 +1,38 @@
 package at.fhv.sys.hotel.models;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "booking_query")
 public class BookingQueryModel {
     @Id
     private String bookingId;
-    private String roomId;
     private String customerId;
+    private String roomId;
     private LocalDate startDate;
     private LocalDate endDate;
     private double totalPrice;
-    private boolean isPaid;
-    private boolean isCancelled;
+    private boolean cancelled;
+    private boolean paid;
+
+    public BookingQueryModel() {
+    }
+
+    public BookingQueryModel(String bookingId, String customerId, String roomId, 
+                           LocalDate startDate, LocalDate endDate, double totalPrice, 
+                           boolean cancelled) {
+        this.bookingId = bookingId;
+        this.customerId = customerId;
+        this.roomId = roomId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.totalPrice = totalPrice;
+        this.cancelled = cancelled;
+        this.paid = false;
+    }
 
     public String getBookingId() {
         return bookingId;
@@ -26,20 +42,20 @@ public class BookingQueryModel {
         this.bookingId = bookingId;
     }
 
-    public String getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(String roomId) {
-        this.roomId = roomId;
-    }
-
     public String getCustomerId() {
         return customerId;
     }
 
     public void setCustomerId(String customerId) {
         this.customerId = customerId;
+    }
+
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
     }
 
     public LocalDate getStartDate() {
@@ -66,19 +82,19 @@ public class BookingQueryModel {
         this.totalPrice = totalPrice;
     }
 
-    public boolean isPaid() {
-        return isPaid;
-    }
-
-    public void setPaid(boolean paid) {
-        isPaid = paid;
-    }
-
     public boolean isCancelled() {
-        return isCancelled;
+        return cancelled;
     }
 
     public void setCancelled(boolean cancelled) {
-        isCancelled = cancelled;
+        this.cancelled = cancelled;
+    }
+
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
     }
 }

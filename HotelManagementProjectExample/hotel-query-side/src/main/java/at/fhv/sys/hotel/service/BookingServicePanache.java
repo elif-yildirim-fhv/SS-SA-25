@@ -26,50 +26,66 @@ public class BookingServicePanache {
 
     @Transactional
     public void cancelBooking(String bookingId) {
-        BookingQueryPanacheModel booking = BookingQueryPanacheModel.findByBookingId(bookingId);
+        BookingQueryPanacheModel booking = getBookingById(bookingId);
         if (booking != null) {
             booking.isCancelled = true;
             booking.persist();
         }
     }
 
-    public List<BookingQueryPanacheModel> getBookingsByDateRange(LocalDate start, LocalDate end) {
-        return BookingQueryPanacheModel.findByDateRange(start, end);
+    @Transactional
+    public void updateBooking(BookingQueryPanacheModel booking) {
+        booking.isPersistent();
+    }
+
+    @Transactional
+    public void deleteAll() {
+        BookingQueryPanacheModel.deleteAll();
     }
 
     public BookingQueryPanacheModel getBookingById(String bookingId) {
-        return BookingQueryPanacheModel.findByBookingId(bookingId);
+        return BookingQueryPanacheModel.find("bookingId", bookingId).firstResult();
+    }
+
+    public List<BookingQueryPanacheModel> getBookingsByDateRange(LocalDate startDate, LocalDate endDate) {
+        return BookingQueryPanacheModel.find(
+            "startDate >= ?1 and endDate <= ?2",
+            startDate, endDate
+        ).list();
     }
 
     public List<BookingQueryPanacheModel> getBookingsByCustomerId(String customerId) {
-        return BookingQueryPanacheModel.findByCustomerId(customerId);
+        return BookingQueryPanacheModel.find(
+            "customerId = ?1",
+            customerId
+        ).list();
+    }
+
+    public List<BookingQueryPanacheModel> getActiveBookings() {
+        return BookingQueryPanacheModel.find(
+            "isCancelled = false and endDate >= ?1",
+            LocalDate.now()
+        ).list();
+    }
+
+    public List<BookingQueryPanacheModel> findCancelledBookings() {
+        return BookingQueryPanacheModel.find(
+            "isCancelled = true"
+        ).list();
+    }
+
+    public List<BookingQueryPanacheModel> findUnpaidBookings() {
+        return BookingQueryPanacheModel.find(
+            "isPaid = false and isCancelled = false"
+        ).list();
     }
 
     public List<BookingQueryPanacheModel> getBookingsByRoomId(String roomId) {
         return BookingQueryPanacheModel.findByRoomId(roomId);
     }
 
-    public List<BookingQueryPanacheModel> getActiveBookings() {
-        return BookingQueryPanacheModel.findActiveBookings();
-    }
-
     public List<BookingQueryPanacheModel> getPaidBookings() {
         return BookingQueryPanacheModel.findPaidBookings();
-    }
-
-    @Transactional
-    public void updateBooking(BookingQueryPanacheModel booking) {
-        BookingQueryPanacheModel existingBooking = BookingQueryPanacheModel.findByBookingId(booking.bookingId);
-        if (existingBooking != null) {
-            existingBooking.roomId = booking.roomId;
-            existingBooking.customerId = booking.customerId;
-            existingBooking.startDate = booking.startDate;
-            existingBooking.endDate = booking.endDate;
-            existingBooking.totalPrice = booking.totalPrice;
-            existingBooking.isPaid = booking.isPaid;
-            existingBooking.isCancelled = booking.isCancelled;
-            existingBooking.persist();
-        }
     }
 
     @Transactional
@@ -83,4 +99,4 @@ public class BookingServicePanache {
     public boolean bookingExists(String bookingId) {
         return BookingQueryPanacheModel.findByBookingId(bookingId) != null;
     }
-} 
+}

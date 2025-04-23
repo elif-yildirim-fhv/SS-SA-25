@@ -1,47 +1,106 @@
 package at.fhv.sys.hotel.projection;
 
 import at.fhv.sys.hotel.commands.shared.events.PaymentReceived;
-import at.fhv.sys.hotel.models.PaymentQueryPanacheModel;
-import at.fhv.sys.hotel.service.PaymentServicePanache;
+import at.fhv.sys.hotel.models.PaymentQueryModel;
+import at.fhv.sys.hotel.models.PaymentStatistics;
+import at.fhv.sys.hotel.service.PaymentService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import org.jboss.logmanager.Logger;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.logging.Logger;
 
 @ApplicationScoped
-public class PaymentProjection {
+public class PaymentProjection implements Projection {
+    private static final Logger logger = Logger.getLogger(PaymentProjection.class.getName());
 
     @Inject
-    PaymentServicePanache paymentServicePanache;
+    PaymentService paymentService;
 
-    public void processPaymentCreatedEvent(PaymentReceived paymentCreatedEvent) {
-        Logger.getAnonymousLogger().info("Processing event: " + paymentCreatedEvent);
-        
-        PaymentQueryPanacheModel payment = new PaymentQueryPanacheModel();
-        payment.paymentId = paymentCreatedEvent.getPaymentId();
-        payment.bookingId = paymentCreatedEvent.getBookingId();
-        payment.amount = paymentCreatedEvent.getAmount();
-        payment.paymentDate = paymentCreatedEvent.getPaymentDate();
-        payment.paymentMethod = paymentCreatedEvent.getPaymentMethod();
-        payment.isCompleted = false;
-        
-        paymentServicePanache.createPayment(payment);
+    public PaymentProjection() {
     }
 
-    public PaymentQueryPanacheModel getPaymentById(String paymentId) {
-        return PaymentQueryPanacheModel.findByPaymentId(paymentId);
+    public PaymentQueryModel getPaymentById(String paymentId) {
+        return paymentService.findById(paymentId);
     }
 
-    public List<PaymentQueryPanacheModel> getPaymentsByBookingId(String bookingId) {
-        return PaymentQueryPanacheModel.findByBookingId(bookingId);
+    public List<PaymentQueryModel> getAllPayments() {
+        return paymentService.findAll();
     }
 
-    public List<PaymentQueryPanacheModel> getAllPayments() {
-        return PaymentQueryPanacheModel.listAll();
+    public List<PaymentQueryModel> getPaymentsByBookingId(String bookingId) {
+        return paymentService.findByBookingId(bookingId);
     }
 
-    public List<PaymentQueryPanacheModel> getPaymentsByMethod(String paymentMethod) {
-        return PaymentQueryPanacheModel.findByPaymentMethod(paymentMethod);
+    public List<PaymentQueryModel> getPaymentsByDateRange(LocalDate startDate, LocalDate endDate) {
+        return paymentService.findByDateRange(startDate, endDate);
+    }
+
+    public List<PaymentQueryModel> getPaymentsByMethod(String paymentMethod) {
+        return paymentService.findByPaymentMethod(paymentMethod);
+    }
+
+    public double getTotalPaymentsForBookingId(String bookingId) {
+        return paymentService.calculateTotalPaymentsForBookingId(bookingId);
+    }
+
+    public List<PaymentQueryModel> getCompletedPayments() {
+        return paymentService.findCompletedPayments();
+    }
+
+    public List<PaymentQueryModel> getPendingPayments() {
+        return paymentService.findPendingPayments();
+    }
+
+    public double getTotalPaymentsForPeriod(LocalDate startDate, LocalDate endDate) {
+        return paymentService.getTotalPaymentsForPeriod(startDate, endDate);
+    }
+
+    public List<PaymentQueryModel> getPaymentsAboveAmount(double amount) {
+        return paymentService.findPaymentsAboveAmount(amount);
+    }
+
+    @Override
+    public void clearState() {
+        try {
+            paymentService.deleteAll();
+        } catch (Exception e) {
+            logger.severe("Error clearing payment state: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public void processEvent(Object event) {
+        if (event instanceof PaymentReceived) {
+            processPaymentReceivedEvent((PaymentReceived) event);
+        }
+    }
+
+    @Transactional
+    public void processPaymentReceivedEvent(PaymentReceived event) {
+        try {
+            logger.info("Processing PaymentReceived event: " + event);
+
+            PaymentQueryModel payment = new PaymentQueryModel(
+                event.getPaymentId(),
+                event.getBookingId(),
+                event.getAmount(),
+                event.getPaymentMethod(),
+                event.getPaymentDate().toLocalDate(),
+                true
+            );
+            paymentService.createPayment(payment);
+
+            paymentService.updatePaymentStatistics(payment);
+
+            logger.info("Successfully processed PaymentReceived event for payment: " + event.getPaymentId());
+        } catch (Exception e) {
+            logger.severe("Error processing PaymentReceived event: " + e.getMessage());
+            throw e;
+        }
     }
 }

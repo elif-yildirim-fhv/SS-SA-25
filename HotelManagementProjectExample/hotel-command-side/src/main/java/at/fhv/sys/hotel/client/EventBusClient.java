@@ -43,6 +43,6 @@ public interface EventBusClient {
     @Path("/roomCreated")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    void processRoomCreatedEvent(RoomCreated event);
+    RoomCreated processRoomCreatedEvent(RoomCreated event);
 
 }
