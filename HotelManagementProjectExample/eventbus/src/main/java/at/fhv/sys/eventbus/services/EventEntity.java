@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Table(name = "event", schema = "event_schema")
 public class EventEntity {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private String id;
 	private String streamId;
 	private String type;
