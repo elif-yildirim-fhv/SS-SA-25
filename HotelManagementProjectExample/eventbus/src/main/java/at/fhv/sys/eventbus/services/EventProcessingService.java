@@ -51,7 +51,6 @@ public class EventProcessingService {
         storeEvent(stream, eventObject);
     }
 
-    @Transactional
     private void storeEvent(String stream, Object eventObject) {
         EventEntity event = new EventEntity();
         event.setId(UUID.randomUUID().toString());
