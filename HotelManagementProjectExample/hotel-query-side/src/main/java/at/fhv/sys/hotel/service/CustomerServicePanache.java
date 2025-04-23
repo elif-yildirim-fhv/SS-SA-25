@@ -1,6 +1,5 @@
 package at.fhv.sys.hotel.service;
 
-import at.fhv.sys.hotel.models.BookingQueryPanacheModel;
 import at.fhv.sys.hotel.models.CustomerQueryPanacheModel;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -29,5 +28,24 @@ public class CustomerServicePanache {
             existingCustomer.birthDate = customer.birthDate;
             existingCustomer.persist();
         }
+    }
+
+    @Transactional
+    public void deleteCustomer(String customerId) {
+        CustomerQueryPanacheModel customer = CustomerQueryPanacheModel.findByCustomerId(customerId);
+        if (customer != null) {
+            customer.delete();
+        }
+    }
+
+    public CustomerQueryPanacheModel getCustomerById(String customerId) {
+        return CustomerQueryPanacheModel.findByCustomerId(customerId);
+    }
+
+    public List<CustomerQueryPanacheModel> searchCustomersByName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return getAllCustomers();
+        }
+        return CustomerQueryPanacheModel.find("name LIKE ?1", "%" + name + "%").list();
     }
 }

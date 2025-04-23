@@ -1,10 +1,7 @@
 package at.fhv.sys.eventbus.controller;
 
 import at.fhv.sys.eventbus.services.EventProcessingService;
-import at.fhv.sys.hotel.commands.shared.events.BookingCreated;
-import at.fhv.sys.hotel.commands.shared.events.CustomerCreated;
-import at.fhv.sys.hotel.commands.shared.events.BookingCancelled;
-import at.fhv.sys.hotel.commands.shared.events.PaymentReceived;
+import at.fhv.sys.hotel.commands.shared.events.*;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -13,7 +10,6 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.jboss.logmanager.Logger;
 
-
 @Path("/api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -21,17 +17,16 @@ public class EventsController {
     @Inject
     EventProcessingService eventStoreService;
 
-    public EventsController() {
-    }
+    private static final Logger LOGGER = Logger.getLogger(EventsController.class.getName());
 
     @POST
     @Path("/customerCreated")
     @Operation(summary = "Process customer created event")
     @APIResponse(responseCode = "200", description = "Event processed successfully")
     public Response customerCreated(CustomerCreated event) {
-        Logger.getAnonymousLogger().info("Received event: " + event);
+        LOGGER.info("Received event: " + event);
         eventStoreService.processEvent("customer-" + event.getCustomerId(), event);
-        return Response.ok(event).build();
+        return Response.ok().build();
     }
 
     @POST
@@ -39,9 +34,9 @@ public class EventsController {
     @Operation(summary = "Process room booked event")
     @APIResponse(responseCode = "200", description = "Event processed successfully")
     public Response bookingCreated(BookingCreated event) {
-        Logger.getAnonymousLogger().info("Received event: " + event);
-        eventStoreService.processEvent("room-" + event.getBookingId(), event);
-        return Response.ok(event).build();
+        LOGGER.info("Received event: " + event);
+        eventStoreService.processEvent("booking-" + event.getBookingId(), event);
+        return Response.ok().build();
     }
 
     @POST
@@ -49,18 +44,33 @@ public class EventsController {
     @Operation(summary = "Process booking cancelled event")
     @APIResponse(responseCode = "200", description = "Event processed successfully")
     public Response bookingCancelled(BookingCancelled event) {
-        Logger.getAnonymousLogger().info("Received event: " + event);
+        LOGGER.info("Received event: " + event);
         eventStoreService.processEvent("booking-" + event.getBookingId(), event);
-        return Response.ok(event).build();
+        return Response.ok().build();
     }
 
     @POST
-    @Path("/paymentCreated")
+    @Path("/paymentReceived")
     @Operation(summary = "Process payment received event")
     @APIResponse(responseCode = "200", description = "Event processed successfully")
-    public Response paymentCreated(PaymentReceived event) {
-        Logger.getAnonymousLogger().info("Received event: " + event);
+    public Response paymentReceived(PaymentReceived event) {
+        LOGGER.info("Received event: " + event);
         eventStoreService.processEvent("payment-" + event.getBookingId(), event);
-        return Response.ok(event).build();
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/roomCreated")
+    @Operation(summary = "Process room created event")
+    @APIResponse(responseCode = "200", description = "Event processed successfully")
+    public Response roomCreated(RoomCreated event) {
+        try {
+            LOGGER.info("Received room created event: " + event);
+            eventStoreService.processEvent("room-" + event.getRoomId(), event);
+            return Response.ok().build();
+        } catch (Exception e) {
+            LOGGER.severe("Error processing room created event: " + e.getMessage());
+            return Response.serverError().entity("Error processing event: " + e.getMessage()).build();
+        }
     }
 }

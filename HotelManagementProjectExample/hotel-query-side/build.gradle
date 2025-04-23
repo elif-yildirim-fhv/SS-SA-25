@@ -16,6 +16,8 @@ dependencies {
     implementation 'io.quarkus:quarkus-smallrye-openapi'
     implementation 'io.quarkus:quarkus-arc'
     implementation 'io.quarkus:quarkus-jdbc-h2'
+    implementation 'org.eclipse.microprofile.openapi:microprofile-openapi-api:3.0'
+    implementation 'io.smallrye:smallrye-open-api-ui:2.1.0'
     implementation 'io.quarkus:quarkus-hibernate-orm'
     implementation 'io.quarkus:quarkus-hibernate-orm-panache'
     implementation 'io.quarkiverse.logging.logback:quarkus-logging-logback:1.1.2'

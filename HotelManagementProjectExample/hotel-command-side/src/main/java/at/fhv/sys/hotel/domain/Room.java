@@ -1,8 +1,5 @@
 package at.fhv.sys.hotel.domain;
 
-
-
-
 public class Room {
     private String roomId;
     private String roomNumber;
@@ -14,7 +11,7 @@ public class Room {
     public Room() {}
 
     public Room(String roomId, String roomNumber, double price, int maxCapacity, boolean isAvailable, String roomType) {
-       this.roomId = java.util.UUID.randomUUID().toString();
+        this.roomId = roomId;
         this.roomNumber = roomNumber;
         this.price = price;
         this.maxCapacity = maxCapacity;
@@ -22,8 +19,8 @@ public class Room {
         this.roomType = roomType;
     }
 
-    public Room( String roomNumber, double price, int maxCapacity, String roomType) {
-        this(null, roomNumber,price, maxCapacity, true, roomType);
+    public Room(String roomNumber, double price, int maxCapacity, String roomType) {
+        this(null, roomNumber, price, maxCapacity, true, roomType);
     }
 
     public String getId() {
