@@ -172,21 +172,22 @@ public class BookingAggregate {
     public void addRoom(Room room) {
         rooms.put(room.getId(), room);
         
+        // Create and send RoomCreated event
+        RoomCreated event = new RoomCreated(
+            room.getId(),
+            room.getRoomNumber(),
+            room.getPrice(),
+            room.getMaxCapacity(),
+            room.isAvailable(),
+            room.getRoomType()
+        );
+        
         try {
-            RoomCreated event = new RoomCreated(
-                room.getId(),
-                room.getRoomNumber(),
-                room.getPrice(),
-                room.getMaxCapacity(),
-                room.isAvailable(),
-                room.getRoomType()
-            );
-            
             eventClient.processRoomCreatedEvent(event);
             LOGGER.info("Room created successfully with ID: " + room.getId());
         } catch (Exception e) {
             LOGGER.severe("Failed to process room created event: " + e.getMessage());
-
+            // We don't throw the exception here as the room is already added to the aggregate
         }
     }
 

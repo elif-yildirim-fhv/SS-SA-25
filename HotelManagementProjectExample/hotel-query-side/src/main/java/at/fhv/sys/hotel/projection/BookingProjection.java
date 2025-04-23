@@ -14,7 +14,7 @@ import jakarta.persistence.PersistenceException;
 import java.util.logging.Logger;
 
 @ApplicationScoped
-public class BookingProjection {
+public class 	BookingProjection {
 
 	@Inject
 	BookingService bookingService;

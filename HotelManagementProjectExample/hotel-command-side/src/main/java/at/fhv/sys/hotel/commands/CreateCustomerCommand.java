@@ -1,6 +1,13 @@
 package at.fhv.sys.hotel.commands;
 
-import java.time.LocalDate;
+import org.wildfly.common.annotation.NotNull;
 
-public record CreateCustomerCommand(String customerId, String name, String email, String address, LocalDate birthDate) {
+import java.time.LocalDate;
+public record CreateCustomerCommand(
+		@NotNull String customerId,
+		String name,
+		String email,
+		String address,
+		LocalDate birthDate
+) {
 }

@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Path("/api/customers")
 @Produces(MediaType.APPLICATION_JSON)
@@ -26,14 +27,16 @@ public class CustomerCommandController {
             @QueryParam("birthDate") String birthDate) {
         try {
             LocalDate parsedBirthDate = LocalDate.parse(birthDate);
-            String customerId = customerAggregate.handle(new CreateCustomerCommand(
-                    null,
+
+            String customerId = UUID.randomUUID().toString();
+            String createdId = customerAggregate.handle(new CreateCustomerCommand(
+                    customerId,
                     name,
                     email,
                     address,
                     parsedBirthDate
             ));
-            return Response.ok(customerId).build();
+            return Response.ok(createdId).build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(e.getMessage())
