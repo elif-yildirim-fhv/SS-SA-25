@@ -1,16 +1,17 @@
 package at.fhv.sys.hotel.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Payment {
     private String id;
     private String bookingId;
     private double amount;
-    private LocalDateTime paymentDate;
-    private PaymentMethod paymentMethod;
+    private LocalDate paymentDate;
+    private String paymentMethod;
     private boolean isCompleted;
 
-    public Payment(String bookingId, double amount, PaymentMethod paymentMethod) {
+    public Payment(String bookingId, double amount, String paymentMethod) {
         if (bookingId == null || bookingId.isEmpty()) {
             throw new IllegalArgumentException("Booking ID is required");
         }
@@ -24,7 +25,7 @@ public class Payment {
         this.id = java.util.UUID.randomUUID().toString();
         this.bookingId = bookingId;
         this.amount = amount;
-        this.paymentDate = LocalDateTime.now();
+        this.paymentDate = LocalDate.now();
         this.paymentMethod = paymentMethod;
         this.isCompleted = false;
     }
@@ -48,18 +49,27 @@ public class Payment {
         this.amount = amount;
     }
 
-    public LocalDateTime getPaymentDate() {
+    public LocalDate getPaymentDate() {
         return paymentDate;
     }
 
-    public PaymentMethod getPaymentMethod() {
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setBookingId(String bookingId) {
+        this.bookingId = bookingId;
+    }
+
+    public void setPaymentDate(LocalDate paymentDate) {
+        this.paymentDate = paymentDate;
+    }
+
+    public String getPaymentMethod() {
         return paymentMethod;
     }
 
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        if (paymentMethod == null) {
-            throw new IllegalArgumentException("Payment method is required");
-        }
+    public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 
@@ -71,10 +81,5 @@ public class Payment {
         isCompleted = completed;
     }
 
-    public enum PaymentMethod {
-        CREDIT_CARD,
-        CASH,
-        BANK_TRANSFER,
-        PAYPAL
-    }
+
 } 

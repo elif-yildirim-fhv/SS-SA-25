@@ -1,5 +1,6 @@
 package at.fhv.sys.hotel.commands.shared.events;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class PaymentReceived {
@@ -7,11 +8,11 @@ public class PaymentReceived {
     private String bookingId;
     private double amount;
     private String paymentMethod;
-    private LocalDateTime paymentDate;
+    private LocalDate paymentDate;
 
     public PaymentReceived() {}
 
-    public PaymentReceived(String paymentId, String bookingId, double amount, String paymentMethod, LocalDateTime paymentDate) {
+    public PaymentReceived(String paymentId, String bookingId, double amount, String paymentMethod, LocalDate paymentDate) {
         this.paymentId = paymentId;
         this.bookingId = bookingId;
         this.amount = amount;
@@ -35,7 +36,7 @@ public class PaymentReceived {
         return paymentMethod;
     }
 
-    public LocalDateTime getPaymentDate() {
+    public LocalDate getPaymentDate() {
         return paymentDate;
     }
 
@@ -55,7 +56,7 @@ public class PaymentReceived {
         this.paymentMethod = paymentMethod;
     }
 
-    public void setPaymentDate(LocalDateTime paymentDate) {
+    public void setPaymentDate(LocalDate paymentDate) {
         this.paymentDate = paymentDate;
     }
 

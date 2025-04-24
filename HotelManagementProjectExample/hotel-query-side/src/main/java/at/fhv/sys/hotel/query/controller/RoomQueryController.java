@@ -39,30 +39,6 @@ public class RoomQueryController {
 	}
 
 	@GET
-	@Path("/{roomId}")
-	public Response getRoomById(@PathParam("roomId") String roomId) {
-		return Response.ok(roomService.getRoomById(roomId)).build();
-	}
-
-	@GET
-	@Path("/available")
-	public Response getAvailableRooms() {
-		return Response.ok(roomService.getAvailableRooms()).build();
-	}
-
-	@GET
-	@Path("/type/{roomType}")
-	public Response getRoomsByType(@PathParam("roomType") String roomType) {
-		return Response.ok(roomService.getRoomsByType(roomType)).build();
-	}
-
-	@GET
-	@Path("/capacity/{minCapacity}")
-	public Response getRoomsByCapacity(@PathParam("minCapacity") int minCapacity) {
-		return Response.ok(roomService.getRoomsByCapacity(minCapacity)).build();
-	}
-
-	@GET
 	@Path("/free")
 	public Response getFreeRooms(@QueryParam("startDate") String startDateStr,
 								 @QueryParam("endDate") String endDateStr,

@@ -46,37 +46,6 @@ public class BookingQueryController {
 	}
 
 	@GET
-	@Path("/bookings")
-	public Response getAllBookings() {
-		List<BookingQueryPanacheModel> bookings = bookingService.getAllBookings();
-		return Response.ok(bookings).build();
-	}
-
-	@GET
-	@Path("/bookings/{bookingId}")
-	public Response getBookingById(@PathParam("bookingId") String bookingId) {
-		BookingQueryPanacheModel booking = bookingService.getBookingById(bookingId);
-		if (booking == null) {
-			return Response.status(Response.Status.NOT_FOUND).entity("Booking not found").build();
-		}
-		return Response.ok(booking).build();
-	}
-
-	@GET
-	@Path("/bookings/customer/{customerId}")
-	public Response getBookingsByCustomerId(@PathParam("customerId") String customerId) {
-		List<BookingQueryPanacheModel> bookings = bookingService.getBookingsByCustomerId(customerId);
-		return Response.ok(bookings).build();
-	}
-
-	@GET
-	@Path("/bookings/room/{roomId}")
-	public Response getBookingsByRoomId(@PathParam("roomId") String roomId) {
-		List<BookingQueryPanacheModel> bookings = bookingService.getBookingsByRoomId(roomId);
-		return Response.ok(bookings).build();
-	}
-
-	@GET
 	@Path("/bookings/date-range")
 	public Response getBookingsByDateRange(@QueryParam("startDate") String startDateStr,
 										   @QueryParam("endDate") String endDateStr) {
@@ -93,17 +62,4 @@ public class BookingQueryController {
 		}
 	}
 
-	@GET
-	@Path("/bookings/active")
-	public Response getActiveBookings() {
-		List<BookingQueryPanacheModel> bookings = bookingService.getActiveBookings();
-		return Response.ok(bookings).build();
-	}
-
-	@GET
-	@Path("/bookings/paid")
-	public Response getPaidBookings() {
-		List<BookingQueryPanacheModel> bookings = bookingService.getPaidBookings();
-		return Response.ok(bookings).build();
-	}
 }

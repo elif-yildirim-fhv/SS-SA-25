@@ -44,21 +44,4 @@ public class CustomerCommandController {
         }
     }
 
-    @PUT
-    @Path("/{customerId}")
-    public Response updateCustomer(
-            @PathParam("customerId") String customerId,
-            @QueryParam("name") String name,
-            @QueryParam("email") String email,
-            @QueryParam("address") String address,
-            @QueryParam("birthDate") String birthDate) {
-        try {
-            // TODO: Implement update command
-            return Response.ok("Customer updated successfully").build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(e.getMessage())
-                    .build();
-        }
-    }
 }

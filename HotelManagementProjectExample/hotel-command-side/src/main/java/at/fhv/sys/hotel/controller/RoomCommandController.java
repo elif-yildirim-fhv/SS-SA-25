@@ -25,7 +25,7 @@ public class RoomCommandController {
     BookingAggregate bookingAggregate;
 
     @POST
-    @Path("/create")
+    @Path("/roomCreated")
     @Operation(
             summary = "Create a new room",
             description = "Creates a new room with the specified details and returns the room ID"
@@ -85,117 +85,4 @@ public class RoomCommandController {
         }
     }
 
-    @GET
-    @Path("/{roomId}")
-    @Operation(
-            summary = "Get room by ID",
-            description = "Retrieves room details by its unique identifier"
-    )
-    @APIResponses(value = {
-            @APIResponse(
-                    responseCode = "200",
-                    description = "Room found",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Room.class))
-            ),
-            @APIResponse(
-                    responseCode = "404",
-                    description = "Room not found",
-                    content = @Content(mediaType = "text/plain")
-            )
-    })
-    public Response getRoom(
-            @Parameter(description = "Room ID", required = true, example = "room-123")
-            @PathParam("roomId") String roomId) {
-
-        Room room = bookingAggregate.getRoom(roomId);
-        if (room == null) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("Room not found")
-                    .build();
-        }
-        return Response.ok(room).build();
-    }
-
-    @PUT
-    @Path("/{roomId}/availability")
-    @Operation(
-            summary = "Update room availability",
-            description = "Updates the availability status of a room"
-    )
-    @APIResponses(value = {
-            @APIResponse(
-                    responseCode = "200",
-                    description = "Room availability updated",
-                    content = @Content(mediaType = "text/plain")
-            ),
-            @APIResponse(
-                    responseCode = "404",
-                    description = "Room not found",
-                    content = @Content(mediaType = "text/plain")
-            )
-    })
-    public Response updateRoomAvailability(
-            @Parameter(description = "Room ID", required = true, example = "room-123")
-            @PathParam("roomId") String roomId,
-
-            @Parameter(description = "Availability status", required = true, example = "true")
-            @QueryParam("available") boolean available) {
-
-        Room room = bookingAggregate.getRoom(roomId);
-        if (room == null) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("Room not found")
-                    .build();
-        }
-
-        room.setAvailable(available);
-        return Response.ok("Room availability updated").build();
-    }
-
-    @PUT
-    @Path("/{roomId}/price")
-    @Operation(
-            summary = "Update room price",
-            description = "Updates the price per night for a room"
-    )
-    @APIResponses(value = {
-            @APIResponse(
-                    responseCode = "200",
-                    description = "Room price updated",
-                    content = @Content(mediaType = "text/plain")
-            ),
-            @APIResponse(
-                    responseCode = "404",
-                    description = "Room not found",
-                    content = @Content(mediaType = "text/plain")
-            ),
-            @APIResponse(
-                    responseCode = "400",
-                    description = "Invalid price",
-                    content = @Content(mediaType = "text/plain")
-            )
-    })
-    public Response updateRoomPrice(
-            @Parameter(description = "Room ID", required = true, example = "room-123")
-            @PathParam("roomId") String roomId,
-
-            @Parameter(description = "New price per night", required = true, example = "175.0")
-            @QueryParam("price") double price) {
-
-        try {
-            Room room = bookingAggregate.getRoom(roomId);
-            if (room == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("Room not found")
-                        .build();
-            }
-
-            room.setPrice(price);
-            return Response.ok("Room price updated").build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Error updating room price: " + e.getMessage())
-                    .build();
-        }
-    }
 }

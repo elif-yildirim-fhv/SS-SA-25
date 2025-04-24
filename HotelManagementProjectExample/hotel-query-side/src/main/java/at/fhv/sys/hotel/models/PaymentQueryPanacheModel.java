@@ -12,8 +12,8 @@ public class PaymentQueryPanacheModel extends PanacheEntity {
     public String paymentId;
     public String bookingId;
     public double amount;
-    public String paymentMethod;
     public LocalDateTime paymentDate;
+    public String paymentMethod;
     public boolean isCompleted;
 
     public PaymentQueryPanacheModel() {

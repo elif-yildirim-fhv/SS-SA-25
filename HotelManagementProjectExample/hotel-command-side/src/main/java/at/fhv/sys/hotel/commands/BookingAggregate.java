@@ -119,21 +119,22 @@ public class BookingAggregate {
                 throw new IllegalStateException("Booking is already paid");
             }
 
+            // Create payment with String payment method
             Payment payment = new Payment(
-                booking.getId(),
-                booking.getTotalPrice(),
-                Payment.PaymentMethod.valueOf(command.paymentMethod())
+                    booking.getId(),
+                    booking.getTotalPrice(),
+                    command.paymentMethod() // Directly use the String
             );
 
             payments.put(payment.getId(), payment);
             booking.setPaid(true);
 
             PaymentReceived event = new PaymentReceived(
-                payment.getId(),
-                booking.getId(),
-                payment.getAmount(),
-                payment.getPaymentMethod().name(),
-                payment.getPaymentDate()
+                    payment.getId(),
+                    booking.getId(),
+                    payment.getAmount(),
+                    payment.getPaymentMethod(), // Already a String
+                    payment.getPaymentDate()
             );
 
             eventClient.processPaymentReceivedEvent(event);

@@ -2,15 +2,13 @@ package at.fhv.sys.hotel.projection;
 
 import at.fhv.sys.hotel.commands.shared.events.PaymentReceived;
 import at.fhv.sys.hotel.models.PaymentQueryModel;
-import at.fhv.sys.hotel.models.PaymentStatistics;
+import at.fhv.sys.hotel.models.PaymentQueryPanacheModel;
 import at.fhv.sys.hotel.service.PaymentService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.jboss.logmanager.Logger;
 
-import java.time.LocalDate;
-import java.util.List;
 
 @ApplicationScoped
 public class PaymentProjection implements Projection {
@@ -43,17 +41,15 @@ public class PaymentProjection implements Projection {
             logger.info("Processing PaymentReceived event: " + event);
 
             PaymentQueryModel payment = new PaymentQueryModel(
-                event.getPaymentId(),
-                event.getBookingId(),
-                event.getAmount(),
-                event.getPaymentMethod(),
-                event.getPaymentDate().toLocalDate(),
-                true
+                    event.getPaymentId(),
+                    event.getBookingId(),
+                    event.getAmount(),
+                    event.getPaymentDate(),
+                    event.getPaymentMethod()
             );
+            payment.setCompleted(true);
+
             paymentService.createPayment(payment);
-
-            paymentService.updatePaymentStatistics(payment);
-
             logger.info("Successfully processed PaymentReceived event for payment: " + event.getPaymentId());
         } catch (Exception e) {
             logger.severe("Error processing PaymentReceived event: " + e.getMessage());

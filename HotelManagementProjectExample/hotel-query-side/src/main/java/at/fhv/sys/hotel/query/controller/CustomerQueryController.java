@@ -36,29 +36,11 @@ public class CustomerQueryController {
         return Response.ok(event).build();
     }
 
-    @POST
-    @Path("/customerUpdated")
-    public Response customerUpdated(CustomerUpdated event) {
-        Logger.getAnonymousLogger().info("Received event: " + event);
-        customerProjection.processCustomerUpdateEvent(event);
-        return Response.ok(event).build();
-    }
-
     @GET
     @Path("/customers")
     public Response getAllCustomers() {
         List<CustomerQueryPanacheModel> customers = customerService.getAllCustomers();
         return Response.ok(customers).build();
-    }
-
-    @GET
-    @Path("/customers/{customerId}")
-    public Response getCustomerById(@PathParam("customerId") String customerId) {
-        CustomerQueryPanacheModel customer = CustomerQueryPanacheModel.findByCustomerId(customerId);
-        if (customer == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Customer not found").build();
-        }
-        return Response.ok(customer).build();
     }
 
     @GET

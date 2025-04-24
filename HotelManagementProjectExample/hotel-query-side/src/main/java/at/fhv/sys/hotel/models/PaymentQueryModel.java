@@ -1,19 +1,19 @@
 package at.fhv.sys.hotel.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "payment_query")
 public class PaymentQueryModel {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String paymentId;
     private String bookingId;
     private double amount;
-    private String paymentMethod;
     private LocalDate paymentDate;
+    private String paymentMethod;
     private boolean completed;
 
     public PaymentQueryModel() {
@@ -27,6 +27,13 @@ public class PaymentQueryModel {
         this.paymentMethod = paymentMethod;
         this.paymentDate = paymentDate;
         this.completed = completed;
+
+
+    }
+
+    public PaymentQueryModel(String paymentId, String bookingId, double amount,
+                             LocalDate paymentDate, String paymentMethod) {
+        this(paymentId, bookingId, amount, paymentMethod, paymentDate, true);
     }
 
     public String getPaymentId() {
