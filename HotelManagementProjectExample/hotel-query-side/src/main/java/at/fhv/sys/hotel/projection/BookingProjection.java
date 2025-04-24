@@ -7,6 +7,7 @@ import at.fhv.sys.hotel.models.BookingQueryModel;
 import at.fhv.sys.hotel.models.RoomAvailabilityModel;
 import at.fhv.sys.hotel.service.BookingService;
 import at.fhv.sys.hotel.service.RoomAvailabilityService;
+import at.fhv.sys.hotel.DTO.GetBookingsDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -15,6 +16,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.logging.Logger;
@@ -45,8 +48,29 @@ public class BookingProjection implements Projection {
 		return bookingService.findByRoomId(roomId);
 	}
 
-	public List<BookingQueryModel> getBookingsByDateRange(LocalDate startDate, LocalDate endDate) {
-		return bookingService.findByDateRange(startDate, endDate);
+	public List<GetBookingsDTO> getBookingsByDateRange(LocalDate startDate, LocalDate endDate) {
+		List<BookingQueryModel> bookings = bookingService.findByDateRange(startDate, endDate);
+		return convertToGetBookingsDTO(bookings);
+	}
+
+	private List<GetBookingsDTO> convertToGetBookingsDTO(List<BookingQueryModel> bookings) {
+		return bookings.stream()
+			.map(booking -> {
+				Set<String> rooms = new HashSet<>();
+				rooms.add(booking.getRoomId());
+				
+				return new GetBookingsDTO(
+					booking.getBookingId(),
+					rooms,
+					booking.getCustomerId(),
+					booking.getStartDate(),
+					booking.getEndDate(),
+					booking.getTotalPrice(),
+					booking.isPaid(),
+					booking.isCancelled()
+				);
+			})
+			.collect(Collectors.toList());
 	}
 
 	public List<BookingQueryModel> getActiveBookings() {
@@ -89,7 +113,6 @@ public class BookingProjection implements Projection {
 		try {
 			LOGGER.info("Processing BookingCreated event: " + event);
 
-			// Create booking
 			BookingQueryModel booking = new BookingQueryModel(
 				event.getBookingId(),
 				event.getCustomerId(),

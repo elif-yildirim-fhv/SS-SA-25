@@ -37,12 +37,12 @@ public interface QueryClient {
     void forwardBookingCancelledEvent(BookingCancelled event);
 
     @POST
-    @Path("/paymentCreated")
+    @Path("payments/paymentCreated")
     @Consumes(MediaType.APPLICATION_JSON)
     PaymentReceived processPaymentCreatedEvent(PaymentReceived event);
 
     @POST
-    @Path("/roomCreated")
+    @Path("/rooms/roomCreated")
     @Consumes(MediaType.APPLICATION_JSON)
     void processRoomCreatedEvent(RoomCreated event);
 }

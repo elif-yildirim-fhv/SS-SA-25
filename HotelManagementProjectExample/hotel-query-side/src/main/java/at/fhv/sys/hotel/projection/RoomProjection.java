@@ -6,6 +6,7 @@ import at.fhv.sys.hotel.models.RoomQueryPanacheModel;
 import at.fhv.sys.hotel.models.RoomAvailabilityModel;
 import at.fhv.sys.hotel.service.RoomService;
 import at.fhv.sys.hotel.service.RoomAvailabilityService;
+import at.fhv.sys.hotel.DTO.FreeRoomsDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -13,6 +14,7 @@ import org.jboss.logmanager.Logger;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class RoomProjection implements Projection {
@@ -32,8 +34,22 @@ public class RoomProjection implements Projection {
         return roomService.getAllRooms();
     }
 
-    public List<RoomQueryPanacheModel> getAvailableRooms(LocalDate startDate, LocalDate endDate, int capacity) {
-        return roomService.getFreeRoomsByDateAndCapacity(startDate, endDate, capacity);
+    public List<FreeRoomsDTO> getAvailableRooms(LocalDate startDate, LocalDate endDate, int capacity) {
+        List<RoomQueryPanacheModel> availableRooms = roomService.getFreeRoomsByDateAndCapacity(startDate, endDate, capacity);
+        return convertToFreeRoomsDTO(availableRooms);
+    }
+    
+    private List<FreeRoomsDTO> convertToFreeRoomsDTO(List<RoomQueryPanacheModel> rooms) {
+        return rooms.stream()
+            .map(room -> new FreeRoomsDTO(
+                room.roomId,
+                room.roomNumber,
+                room.price,
+                room.maxCapacity,
+                room.isAvailable,
+                room.roomType
+            ))
+            .collect(Collectors.toList());
     }
 
     public List<RoomQueryPanacheModel> getRoomsByType(String roomType) {
@@ -70,7 +86,6 @@ public class RoomProjection implements Projection {
         try {
             LOGGER.info("Processing RoomCreated event: " + event);
 
-            // Create room
             RoomQueryPanacheModel room = new RoomQueryPanacheModel(
                     event.getRoomId(),
                     event.getRoomNumber(),
@@ -81,7 +96,6 @@ public class RoomProjection implements Projection {
             room.isAvailable = event.isAvailable();
             roomService.createRoom(room);
 
-            // Add availability if the room is available
             if (event.isAvailable()) {
                 LocalDate today = LocalDate.now();
                 LocalDate endOfYear = today.plusYears(1);

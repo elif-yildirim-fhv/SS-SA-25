@@ -19,49 +19,6 @@ public class PaymentProjection implements Projection {
     @Inject
     PaymentService paymentService;
 
-    public PaymentProjection() {
-    }
-
-    public PaymentQueryModel getPaymentById(String paymentId) {
-        return paymentService.findById(paymentId);
-    }
-
-    public List<PaymentQueryModel> getAllPayments() {
-        return paymentService.findAll();
-    }
-
-    public List<PaymentQueryModel> getPaymentsByBookingId(String bookingId) {
-        return paymentService.findByBookingId(bookingId);
-    }
-
-    public List<PaymentQueryModel> getPaymentsByDateRange(LocalDate startDate, LocalDate endDate) {
-        return paymentService.findByDateRange(startDate, endDate);
-    }
-
-    public List<PaymentQueryModel> getPaymentsByMethod(String paymentMethod) {
-        return paymentService.findByPaymentMethod(paymentMethod);
-    }
-
-    public double getTotalPaymentsForBookingId(String bookingId) {
-        return paymentService.calculateTotalPaymentsForBookingId(bookingId);
-    }
-
-    public List<PaymentQueryModel> getCompletedPayments() {
-        return paymentService.findCompletedPayments();
-    }
-
-    public List<PaymentQueryModel> getPendingPayments() {
-        return paymentService.findPendingPayments();
-    }
-
-    public double getTotalPaymentsForPeriod(LocalDate startDate, LocalDate endDate) {
-        return paymentService.getTotalPaymentsForPeriod(startDate, endDate);
-    }
-
-    public List<PaymentQueryModel> getPaymentsAboveAmount(double amount) {
-        return paymentService.findPaymentsAboveAmount(amount);
-    }
-
     @Override
     public void clearState() {
         try {

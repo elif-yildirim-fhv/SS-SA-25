@@ -30,31 +30,5 @@ public class PaymentQueryController {
         return Response.ok(event).build();
     }
 
-    @GET
-    @Path("/{paymentId}")
-    public Response getPaymentById(@PathParam("paymentId") String paymentId) {
-        return Response.ok(paymentProjection.getPaymentById(paymentId)).build();
-    }
 
-    @GET
-    @Path("/booking/{bookingId}")
-    public Response getPaymentsByBookingId(@PathParam("bookingId") String bookingId) {
-        return Response.ok(paymentProjection.getPaymentsByBookingId(bookingId)).build();
-    }
-
-    @GET
-    public Response getAllPayments() {
-        return Response.ok(paymentProjection.getAllPayments()).build();
-    }
-
-    @GET
-    @Path("/method/{paymentMethod}")
-    public Response getPaymentsByMethod(@PathParam("paymentMethod") String paymentMethod) {
-        return Response.ok(paymentProjection.getPaymentsByMethod(paymentMethod)).build();
-    }
-
-    @Transactional
-    public void processPaymentEvent(PaymentReceived event) {
-        paymentProjection.processPaymentReceivedEvent(event);
-    }
 }
