@@ -1,22 +1,34 @@
 package at.fhv.sys.eventbus.services;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "event")
+@Table(name = "event", schema = "event_schema")
 public class EventEntity {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private String id;
 	private String streamId;
 	private String type;
 	@Lob
 	private String data;
 	private LocalDateTime timestamp;
+
+
+
+	public EventEntity( String streamId, String type, String data) {
+		this();
+		this.streamId = streamId;
+		this.type = type;
+		this.data = data;
+		this.timestamp = LocalDateTime.now();
+	}
+
+	public EventEntity() {
+
+	}
 
 	public String getId() {
 		return id;

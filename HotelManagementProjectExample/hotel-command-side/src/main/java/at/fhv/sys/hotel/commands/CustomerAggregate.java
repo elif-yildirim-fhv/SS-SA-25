@@ -23,7 +23,7 @@ public class CustomerAggregate {
 
 	public String handle(CreateCustomerCommand command) {
 		try {
-			// Erstelle Customer mit Domain-Logik
+
 			Customer customer = new Customer(
 					command.name(),
 					command.email(),

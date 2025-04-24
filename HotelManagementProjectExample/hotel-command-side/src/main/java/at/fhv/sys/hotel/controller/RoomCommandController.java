@@ -13,6 +13,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import java.util.Map;
 
 @Path("/api/rooms")
 @Produces(MediaType.APPLICATION_JSON)
@@ -33,12 +34,12 @@ public class RoomCommandController {
             @APIResponse(
                     responseCode = "200",
                     description = "Room created successfully",
-                    content = @Content(mediaType = "text/plain")
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)
             ),
             @APIResponse(
                     responseCode = "400",
                     description = "Invalid room data",
-                    content = @Content(mediaType = "text/plain")
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)
             )
     })
     public Response createRoom(
@@ -57,29 +58,29 @@ public class RoomCommandController {
         try {
             if (roomNumber == null || roomNumber.trim().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Room number is required")
+                        .entity(Map.of("error", "Room number is required"))
                         .build();
             }
 
             if (price <= 0) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Price must be positive")
+                        .entity(Map.of("error", "Price must be positive"))
                         .build();
             }
 
             if (maxCapacity <= 0) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Max capacity must be positive")
+                        .entity(Map.of("error", "Max capacity must be positive"))
                         .build();
             }
 
             Room room = new Room(roomNumber, price, maxCapacity, roomType);
             bookingAggregate.addRoom(room);
 
-            return Response.ok("Room created with ID: " + room.getId()).build();
+            return Response.ok(Map.of("message", "Room created successfully", "roomId", room.getId())).build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Error creating room: " + e.getMessage())
+                    .entity(Map.of("error", "Error creating room: " + e.getMessage()))
                     .build();
         }
     }

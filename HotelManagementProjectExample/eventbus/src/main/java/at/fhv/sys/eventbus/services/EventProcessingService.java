@@ -1,6 +1,7 @@
 package at.fhv.sys.eventbus.services;
 
 import at.fhv.sys.eventbus.client.QueryClient;
+import at.fhv.sys.eventbus.repository.EventStoreRepository;
 import at.fhv.sys.hotel.commands.shared.events.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -9,6 +10,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logmanager.Logger;
+import jakarta.json.bind.JsonbBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,57 +27,105 @@ public class EventProcessingService {
     @PersistenceContext
     EntityManager entityManager;
 
+    EventStoreRepository eventStoreRepository;
+
+    public EventProcessingService() {
+        this.eventStoreRepository = new EventStoreRepository();
+    }
+
     @Transactional
     public void processEvent(String stream, Object eventObject) {
         LOG.info("Processing event: " + eventObject.getClass().getSimpleName());
+        LOG.fine("Event details: " + eventObject);
 
-        // Forward event to query side
-        if (eventObject instanceof CustomerCreated) {
-            queryClient.forwardCustomerCreatedEvent((CustomerCreated) eventObject);
-        } else if (eventObject instanceof CustomerUpdated) {
-            queryClient.forwardCustomerUpdatedEvent((CustomerUpdated) eventObject);
-        } else if (eventObject instanceof BookingCreated) {
-            queryClient.forwardRoomBookedEvent((BookingCreated) eventObject);
-        } else if (eventObject instanceof BookingCancelled) {
-            queryClient.forwardBookingCancelledEvent((BookingCancelled) eventObject);
-        } else if (eventObject instanceof PaymentReceived) {
-            queryClient.processPaymentCreatedEvent((PaymentReceived) eventObject);
-        } else if (eventObject instanceof RoomCreated) {
-            // Forward room created event
-            // Implementation needed in QueryClient
-        } else {
-            LOG.warning("Unknown event type: " + eventObject.getClass().getName());
+        try {
+            // Store event in EventStore first (most important part)
+            LOG.fine("Starting to store event in database");
+            storeEvent(stream, eventObject);
+            LOG.fine("Event stored successfully in database");
+
+            // Then try to forward the event to query side
+            try {
+                LOG.fine("Attempting to forward event to query side");
+                forwardEventToQuerySide(eventObject);
+                LOG.fine("Event forwarded successfully to query side");
+            } catch (Exception e) {
+                // Log error but don't propagate it further
+                LOG.severe("Failed to forward event to query side: " + e.getMessage());
+                e.printStackTrace();
+                LOG.severe("Event was stored in database but query side was not updated.");
+                // Don't rethrow so we don't fail the entire operation
+                // The event is already stored in the database
+            }
+        } catch (Exception e) {
+            LOG.severe("Critical error in processEvent: " + e.getMessage());
+            e.printStackTrace();
+            throw e; // Rethrow critical errors
         }
+    }
 
-        // Store event in EventStore
-        storeEvent(stream, eventObject);
+    private void forwardEventToQuerySide(Object eventObject) {
+        try {
+            LOG.info("Forwarding event to query side: " + eventObject.getClass().getSimpleName());
+            
+            // Forward event to query side
+            if (eventObject instanceof CustomerCreated) {
+                LOG.info("Forwarding CustomerCreated event");
+                queryClient.forwardCustomerCreatedEvent((CustomerCreated) eventObject);
+                LOG.fine("CustomerCreated event forwarded successfully");
+            } else if (eventObject instanceof CustomerUpdated) {
+                LOG.fine("Forwarding CustomerUpdated event");
+                queryClient.forwardCustomerUpdatedEvent((CustomerUpdated) eventObject);
+                LOG.fine("CustomerUpdated event forwarded successfully");
+            } else if (eventObject instanceof BookingCreated) {
+                LOG.fine("Forwarding BookingCreated event");
+                queryClient.forwardRoomBookedEvent((BookingCreated) eventObject);
+                LOG.fine("BookingCreated event forwarded successfully");
+            } else if (eventObject instanceof BookingCancelled) {
+                LOG.fine("Forwarding BookingCancelled event");
+                queryClient.forwardBookingCancelledEvent((BookingCancelled) eventObject);
+                LOG.fine("BookingCancelled event forwarded successfully");
+            } else if (eventObject instanceof PaymentReceived) {
+                LOG.fine("Forwarding PaymentReceived event");
+                queryClient.processPaymentCreatedEvent((PaymentReceived) eventObject);
+                LOG.fine("PaymentReceived event forwarded successfully");
+            } else if (eventObject instanceof RoomCreated) {
+                // Forward room created event - not implemented in query side yet
+                LOG.info("No handler for RoomCreated event in query side yet");
+            } else {
+                LOG.warning("Unknown event type: " + eventObject.getClass().getName());
+            }
+        } catch (Exception e) {
+            LOG.severe("Error in forwarding event: " + e.getMessage());
+            LOG.severe("Exception class: " + e.getClass().getName());
+            e.printStackTrace();
+            // Rethrow to be handled by the caller
+            throw e;
+        }
     }
 
     private void storeEvent(String stream, Object eventObject) {
-        EventEntity event = new EventEntity();
-        event.setId(UUID.randomUUID().toString());
-        event.setStreamId(stream);
-        event.setType(eventObject.getClass().getSimpleName());
-        event.setData(serializeEvent(eventObject));
-        event.setTimestamp(LocalDateTime.now());
+        try {
+            LOG.info("Storing event in database: " + eventObject.getClass().getSimpleName());
+            
+            EventEntity event = new EventEntity();
+            event.setId(UUID.randomUUID().toString());
+            event.setStreamId(stream);
+            event.setType(eventObject.getClass().getSimpleName());
+            event.setData(serializeEvent(eventObject));
+            event.setTimestamp(LocalDateTime.now());
 
-        entityManager.persist(event);
-        LOG.info("Event stored in EventStore: " + event.getId());
+            eventStoreRepository.saveEvent(event.getStreamId(), eventObject);
+            LOG.info("Event stored in EventStore: " + event.getId());
+        } catch (Exception e) {
+            LOG.severe("Failed to store event in database: " + e.getMessage());
+            throw e; // This is critical so we rethrow
+        }
     }
 
     private String serializeEvent(Object eventObject) {
-        // Simple serialization - in a real application, use JSON serialization
-        return eventObject.toString();
+        // Proper JSON serialization
+        return JsonbBuilder.create().toJson(eventObject);
     }
 
-    public List<EventEntity> getAllEvents() {
-        return entityManager.createQuery("SELECT e FROM EventEntity e ORDER BY e.timestamp", EventEntity.class)
-                .getResultList();
-    }
-
-    public List<EventEntity> getEventsByStream(String streamId) {
-        return entityManager.createQuery("SELECT e FROM EventEntity e WHERE e.streamId = :streamId ORDER BY e.timestamp", EventEntity.class)
-                .setParameter("streamId", streamId)
-                .getResultList();
-    }
 }
