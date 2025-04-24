@@ -109,8 +109,10 @@ public class EventProcessingService {
                 queryClient.processPaymentCreatedEvent((PaymentReceived) eventObject);
                 LOG.fine("PaymentReceived event forwarded successfully");
             } else if (eventObject instanceof RoomCreated) {
-                // Forward room created event - not implemented in query side yet
-                LOG.info("No handler for RoomCreated event in query side yet");
+                LOG.fine("Forwarding RoomCreated event");
+                // Add this line to forward RoomCreated events
+                queryClient.processRoomCreatedEvent((RoomCreated) eventObject);
+                LOG.fine("RoomCreated event forwarded successfully");
             } else {
                 LOG.warning("Unknown event type: " + eventObject.getClass().getName());
             }

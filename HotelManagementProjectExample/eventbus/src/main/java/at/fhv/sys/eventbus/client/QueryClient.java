@@ -40,6 +40,11 @@ public interface QueryClient {
     @Path("/paymentCreated")
     @Consumes(MediaType.APPLICATION_JSON)
     PaymentReceived processPaymentCreatedEvent(PaymentReceived event);
+
+    @POST
+    @Path("/roomCreated")
+    @Consumes(MediaType.APPLICATION_JSON)
+    void processRoomCreatedEvent(RoomCreated event);
 }
 
 

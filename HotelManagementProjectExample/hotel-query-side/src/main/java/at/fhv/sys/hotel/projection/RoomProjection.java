@@ -72,23 +72,24 @@ public class RoomProjection implements Projection {
 
             // Create room
             RoomQueryPanacheModel room = new RoomQueryPanacheModel(
-                event.getRoomId(),
-                event.getRoomNumber(),
-                event.getPrice(),
-                event.getMaxCapacity()
+                    event.getRoomId(),
+                    event.getRoomNumber(),
+                    event.getPrice(),
+                    event.getMaxCapacity()
             );
             room.roomType = event.getRoomType();
             room.isAvailable = event.isAvailable();
             roomService.createRoom(room);
 
-            LocalDate today = LocalDate.now();
-            LocalDate endOfYear = today.plusYears(1);
-
+            // Add availability if the room is available
             if (event.isAvailable()) {
+                LocalDate today = LocalDate.now();
+                LocalDate endOfYear = today.plusYears(1);
+
                 RoomAvailabilityModel availability = new RoomAvailabilityModel(
-                    event.getRoomId(),
-                    today,
-                    endOfYear
+                        event.getRoomId(),
+                        today,
+                        endOfYear
                 );
                 roomAvailabilityService.addAvailability(availability);
             }
