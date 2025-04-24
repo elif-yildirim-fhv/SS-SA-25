@@ -1,15 +1,15 @@
 package at.fhv.sys.eventbus.services;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "event", schema = "event_schema")
-public class EventEntity {
+public class EventEntity extends PanacheEntityBase {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private String id;
+	private Long id;
 	private String streamId;
 	private String type;
 	@Lob
@@ -19,22 +19,20 @@ public class EventEntity {
 
 
 	public EventEntity( String streamId, String type, String data) {
-		this();
+		this.timestamp = LocalDateTime.now();
 		this.streamId = streamId;
 		this.type = type;
 		this.data = data;
-		this.timestamp = LocalDateTime.now();
 	}
 
 	public EventEntity() {
-
 	}
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -42,31 +40,26 @@ public class EventEntity {
 		return streamId;
 	}
 
-	public void setStreamId(String streamId) {
-		this.streamId = streamId;
-	}
-
 	public String getType() {
 		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	public String getData() {
 		return data;
 	}
 
-	public void setData(String data) {
-		this.data = data;
-	}
-
 	public LocalDateTime getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
+	@Override
+	public String toString() {
+		return "EventEntity{" +
+				"id=" + id +
+				", streamId='" + streamId + '\'' +
+				", type='" + type + '\'' +
+				", data='" + data + '\'' +
+				", timestamp=" + timestamp +
+				'}';
 	}
 }

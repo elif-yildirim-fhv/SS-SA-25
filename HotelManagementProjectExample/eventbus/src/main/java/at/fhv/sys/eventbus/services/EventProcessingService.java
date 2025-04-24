@@ -1,8 +1,11 @@
 package at.fhv.sys.eventbus.services;
 
 import at.fhv.sys.eventbus.client.QueryClient;
-import at.fhv.sys.eventbus.repository.EventStoreRepository;
+import at.fhv.sys.eventbus.repository.EventEntityPanache;
 import at.fhv.sys.hotel.commands.shared.events.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -24,50 +27,66 @@ public class EventProcessingService {
     @RestClient
     QueryClient queryClient;
 
-    @PersistenceContext
-    EntityManager entityManager;
+//    @Inject
+//    EventStoreRepository eventStoreRepository;
 
-    EventStoreRepository eventStoreRepository;
+    @Inject //So wie Autowired, kein Constructor nötig :D kann man aber lieber ned
+    ObjectMapper objectMapper;
 
-    public EventProcessingService() {
-        this.eventStoreRepository = new EventStoreRepository();
-    }
+    @Inject
+    EventEntityPanache eventEntityPanache;
 
     @Transactional
-    public void processEvent(String stream, Object eventObject) {
-        LOG.info("Processing event: " + eventObject.getClass().getSimpleName());
-        LOG.fine("Event details: " + eventObject);
-
-        try {
-            // Store event in EventStore first (most important part)
-            LOG.fine("Starting to store event in database");
-            storeEvent(stream, eventObject);
-            LOG.fine("Event stored successfully in database");
-
-            // Then try to forward the event to query side
-            try {
-                LOG.fine("Attempting to forward event to query side");
-                forwardEventToQuerySide(eventObject);
-                LOG.fine("Event forwarded successfully to query side");
-            } catch (Exception e) {
-                // Log error but don't propagate it further
-                LOG.severe("Failed to forward event to query side: " + e.getMessage());
-                e.printStackTrace();
-                LOG.severe("Event was stored in database but query side was not updated.");
-                // Don't rethrow so we don't fail the entire operation
-                // The event is already stored in the database
-            }
-        } catch (Exception e) {
-            LOG.severe("Critical error in processEvent: " + e.getMessage());
-            e.printStackTrace();
-            throw e; // Rethrow critical errors
+    public void processEvent(String stream, Object eventObject) throws JsonProcessingException {
+        String payload = null;
+        try{
+            payload = objectMapper.writeValueAsString(eventObject);
+            EventEntity eventEntity = new EventEntity(
+                    stream,
+                    eventObject.getClass().getSimpleName(),
+                    payload
+            );
+            Logger.getAnonymousLogger().info(eventEntity.toString());
+            eventEntityPanache.createEvent(eventEntity);
+        }catch(Exception e){
+            Logger.getAnonymousLogger().warning(e.getMessage());
         }
+
+
+
+//        LOG.info("Processing event: " + eventObject.getClass().getSimpleName());
+//        LOG.fine("Event details: " + eventObject);
+//
+//        try {
+//            // Store event in EventStore first (most important part)
+//            LOG.fine("Starting to store event in database");
+//            storeEvent(stream, eventObject);
+//            LOG.fine("Event stored successfully in database");
+//
+//            // Then try to forward the event to query side
+//            try {
+//                LOG.fine("Attempting to forward event to query side");
+//                forwardEventToQuerySide(eventObject);
+//                LOG.fine("Event forwarded successfully to query side");
+//            } catch (Exception e) {
+//                // Log error but don't propagate it further
+//                LOG.severe("Failed to forward event to query side: " + e.getMessage());
+//                e.printStackTrace();
+//                LOG.severe("Event was stored in database but query side was not updated.");
+//                // Don't rethrow so we don't fail the entire operation
+//                // The event is already stored in the database
+//            }
+//        } catch (Exception e) {
+//            LOG.severe("Critical error in processEvent: " + e.getMessage());
+//            e.printStackTrace();
+//            throw e; // Rethrow critical errors
+//        }
     }
 
-    private void forwardEventToQuerySide(Object eventObject) {
+    public void forwardEventToQuerySide(Object eventObject) {
         try {
             LOG.info("Forwarding event to query side: " + eventObject.getClass().getSimpleName());
-            
+
             // Forward event to query side
             if (eventObject instanceof CustomerCreated) {
                 LOG.info("Forwarding CustomerCreated event");
@@ -104,24 +123,22 @@ public class EventProcessingService {
         }
     }
 
-    private void storeEvent(String stream, Object eventObject) {
-        try {
-            LOG.info("Storing event in database: " + eventObject.getClass().getSimpleName());
-            
-            EventEntity event = new EventEntity();
-            event.setId(UUID.randomUUID().toString());
-            event.setStreamId(stream);
-            event.setType(eventObject.getClass().getSimpleName());
-            event.setData(serializeEvent(eventObject));
-            event.setTimestamp(LocalDateTime.now());
-
-            eventStoreRepository.saveEvent(event.getStreamId(), eventObject);
-            LOG.info("Event stored in EventStore: " + event.getId());
-        } catch (Exception e) {
-            LOG.severe("Failed to store event in database: " + e.getMessage());
-            throw e; // This is critical so we rethrow
-        }
-    }
+//    private void storeEvent(String stream, Object eventObject) {
+//        try {
+//            LOG.info("Storing event in database: " + eventObject.getClass().getSimpleName());
+//
+//            EventEntity event = new EventEntity(
+//                    stream,
+//                    eventObject.getClass().getSimpleName(),
+//                    );
+//
+//            eventStoreRepository.saveEvent(event.getStreamId(), eventObject);
+//            LOG.info("Event stored in EventStore: " + event.getId());
+//        } catch (Exception e) {
+//            LOG.severe("Failed to store event in database: " + e.getMessage());
+//            throw e; // This is critical so we rethrow
+//        }
+//    }
 
     private String serializeEvent(Object eventObject) {
         // Proper JSON serialization
