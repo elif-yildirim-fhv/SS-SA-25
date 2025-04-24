@@ -5,6 +5,7 @@ import at.fhv.sys.hotel.commands.shared.events.BookingCreated;
 import at.fhv.sys.hotel.models.BookingQueryPanacheModel;
 import at.fhv.sys.hotel.projection.BookingProjection;
 import at.fhv.sys.hotel.service.BookingServicePanache;
+import at.fhv.sys.hotel.DTO.GetBookingsDTO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -83,7 +84,7 @@ public class BookingQueryController {
 			LocalDate startDate = LocalDate.parse(startDateStr);
 			LocalDate endDate = LocalDate.parse(endDateStr);
 
-			List<BookingQueryPanacheModel> bookings = bookingService.getBookingsByDateRange(startDate, endDate);
+			List<GetBookingsDTO> bookings = bookingProjection.getBookingsByDateRange(startDate, endDate);
 			return Response.ok(bookings).build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.BAD_REQUEST)

@@ -4,6 +4,7 @@ import at.fhv.sys.hotel.commands.shared.events.RoomCreated;
 import at.fhv.sys.hotel.models.RoomQueryPanacheModel;
 import at.fhv.sys.hotel.projection.RoomProjection;
 import at.fhv.sys.hotel.service.RoomService;
+import at.fhv.sys.hotel.DTO.FreeRoomsDTO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -70,7 +71,7 @@ public class RoomQueryController {
 			LocalDate startDate = LocalDate.parse(startDateStr);
 			LocalDate endDate = LocalDate.parse(endDateStr);
 
-			List<RoomQueryPanacheModel> freeRooms = roomService.getFreeRoomsByDateAndCapacity(startDate, endDate, persons);
+			List<FreeRoomsDTO> freeRooms = roomProjection.getAvailableRooms(startDate, endDate, persons);
 			return Response.ok(freeRooms).build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.BAD_REQUEST)

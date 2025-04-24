@@ -3,7 +3,6 @@ package at.fhv.sys.hotel.query;
 import at.fhv.sys.hotel.commands.shared.events.*;
 import at.fhv.sys.hotel.projection.BookingProjection;
 import at.fhv.sys.hotel.projection.CustomerProjection;
-import at.fhv.sys.hotel.projection.HotelProjection;
 import at.fhv.sys.hotel.projection.RoomProjection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -23,8 +22,7 @@ public class EventHandler {
     @Inject
     CustomerProjection customerProjection;
     
-    @Inject
-    HotelProjection hotelProjection;
+
 
     @Transactional
     public void handleEvent(Object event) {
@@ -34,7 +32,6 @@ public class EventHandler {
             roomProjection.processEvent(event);
         } else if (event instanceof BookingCreated || event instanceof BookingCancelled || event instanceof PaymentReceived) {
             bookingProjection.processEvent(event);
-            hotelProjection.processEvent(event);
         } else if (event instanceof CustomerCreated || event instanceof CustomerUpdated) {
             customerProjection.processEvent(event);
         } else {

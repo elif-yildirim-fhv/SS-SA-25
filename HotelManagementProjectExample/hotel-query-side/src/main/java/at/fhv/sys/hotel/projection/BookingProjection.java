@@ -112,7 +112,42 @@ public class BookingProjection implements Projection {
 	public void processBookingCreatedEvent(BookingCreated event) {
 		try {
 			LOGGER.info("Processing BookingCreated event: " + event);
-
+			
+			// Freie Zimmer für den Zeitraum finden
+			List<RoomAvailabilityModel> freeRooms = roomAvailabilityService.findAvailableRooms(
+				event.getStartDate(), event.getEndDate());
+			List<RoomAvailabilityModel> adaptedRooms = new ArrayList<>();
+			
+			// Filtern nach den gebuchten Zimmern und Verfügbarkeit anpassen
+			freeRooms.stream()
+				.filter(r -> r.getRoomId().equals(event.getRoomId()))
+				.forEach(r -> {
+					// Verfügbarkeit vor der Buchung
+					if (r.getStartDate().isBefore(event.getStartDate())) {
+						adaptedRooms.add(new RoomAvailabilityModel(
+							r.getRoomId(),
+							r.getStartDate(),
+							event.getStartDate()
+						));
+					}
+					
+					// Verfügbarkeit nach der Buchung
+					if (r.getEndDate().isAfter(event.getEndDate())) {
+						adaptedRooms.add(new RoomAvailabilityModel(
+							r.getRoomId(),
+							event.getEndDate(),
+							r.getEndDate()
+						));
+					}
+					
+					// Verfügbarkeit entfernen
+					roomAvailabilityService.removeAvailability(r);
+				});
+			
+			// Angepasste Verfügbarkeiten hinzufügen
+			adaptedRooms.forEach(r -> roomAvailabilityService.addAvailability(r));
+			
+			// Buchung erstellen
 			BookingQueryModel booking = new BookingQueryModel(
 				event.getBookingId(),
 				event.getCustomerId(),
@@ -123,14 +158,7 @@ public class BookingProjection implements Projection {
 				false
 			);
 			bookingService.createBooking(booking);
-
-			RoomAvailabilityModel availability = new RoomAvailabilityModel(
-				event.getRoomId(),
-				event.getStartDate(),
-				event.getEndDate()
-			);
-			roomAvailabilityService.addAvailability(availability);
-
+			
 			LOGGER.info("Successfully processed BookingCreated event for booking: " + event.getBookingId());
 		} catch (Exception e) {
 			LOGGER.severe("Error processing BookingCreated event: " + e.getMessage());
@@ -142,19 +170,52 @@ public class BookingProjection implements Projection {
 	public void processBookingCancelledEvent(BookingCancelled event) {
 		try {
 			LOGGER.info("Processing BookingCancelled event: " + event);
-
+			
+			// Buchung suchen und stornieren
 			BookingQueryModel booking = bookingService.findById(event.getBookingId());
 			if (booking != null) {
 				booking.setCancelled(true);
 				bookingService.updateBooking(booking);
-
-				roomAvailabilityService.removeAvailability(
-					booking.getRoomId(),
-					booking.getStartDate(),
-					booking.getEndDate()
-				);
+				
+				// Randfälle für Verfügbarkeiten an Start- und Enddatum suchen
+				List<RoomAvailabilityModel> edgeCases = Stream.concat(
+					roomAvailabilityService.findAdjacentAvailability(booking.getRoomId(), 
+						booking.getStartDate(), booking.getStartDate()).stream(),
+					roomAvailabilityService.findAdjacentAvailability(booking.getRoomId(), 
+						booking.getEndDate(), booking.getEndDate()).stream()
+				).collect(Collectors.toList());
+				
+				if (edgeCases.isEmpty()) {
+					// Keine angrenzenden Verfügbarkeiten, einfach neue erstellen
+					roomAvailabilityService.addAvailability(new RoomAvailabilityModel(
+						booking.getRoomId(),
+						booking.getStartDate(),
+						booking.getEndDate()
+					));
+				} else {
+					// Verfügbarkeiten zusammenführen
+					LocalDate startDate = edgeCases.stream()
+						.map(RoomAvailabilityModel::getStartDate)
+						.min(LocalDate::compareTo)
+						.orElse(booking.getStartDate());
+					
+					LocalDate endDate = edgeCases.stream()
+						.map(RoomAvailabilityModel::getEndDate)
+						.max(LocalDate::compareTo)
+						.orElse(booking.getEndDate());
+					
+					// Neue zusammengeführte Verfügbarkeit erstellen
+					roomAvailabilityService.addAvailability(new RoomAvailabilityModel(
+						booking.getRoomId(),
+						startDate.isBefore(booking.getStartDate()) ? startDate : booking.getStartDate(),
+						endDate.isAfter(booking.getEndDate()) ? endDate : booking.getEndDate()
+					));
+					
+					// Alte Verfügbarkeiten entfernen
+					edgeCases.forEach(r -> roomAvailabilityService.removeAvailability(r));
+				}
 			}
-
+			
 			LOGGER.info("Successfully processed BookingCancelled event for booking: " + event.getBookingId());
 		} catch (Exception e) {
 			LOGGER.severe("Error processing BookingCancelled event: " + e.getMessage());

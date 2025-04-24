@@ -5,6 +5,7 @@ import at.fhv.sys.hotel.commands.shared.events.CustomerUpdated;
 import at.fhv.sys.hotel.models.CustomerQueryPanacheModel;
 import at.fhv.sys.hotel.projection.CustomerProjection;
 import at.fhv.sys.hotel.service.CustomerServicePanache;
+import at.fhv.sys.hotel.DTO.GetCustomerDTO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -63,11 +64,7 @@ public class CustomerQueryController {
     @GET
     @Path("/customers/search")
     public Response searchCustomersByName(@QueryParam("name") String name) {
-        if (name == null || name.trim().isEmpty()) {
-            return Response.ok(customerService.getAllCustomers()).build();
-        }
-
-        List<CustomerQueryPanacheModel> customers = CustomerQueryPanacheModel.find("name LIKE ?1", "%" + name + "%").list();
+        List<GetCustomerDTO> customers = customerProjection.getCustomers(name);
         return Response.ok(customers).build();
     }
 }

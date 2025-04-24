@@ -3,19 +3,26 @@ package at.fhv.sys.hotel.projection;
 import at.fhv.sys.hotel.commands.shared.events.CustomerCreated;
 import at.fhv.sys.hotel.commands.shared.events.CustomerUpdated;
 import at.fhv.sys.hotel.models.CustomerQueryModel;
+import at.fhv.sys.hotel.models.CustomerQueryPanacheModel;
 import at.fhv.sys.hotel.service.CustomerService;
+import at.fhv.sys.hotel.service.CustomerServicePanache;
+import at.fhv.sys.hotel.DTO.GetCustomerDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.jboss.logmanager.Logger;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CustomerProjection implements Projection {
 
     @Inject
     CustomerService customerService;
+    
+    @Inject
+    CustomerServicePanache customerServicePanache;
 
     private static final Logger logger = Logger.getLogger(CustomerProjection.class.getName());
 
@@ -56,6 +63,15 @@ public class CustomerProjection implements Projection {
             );
             customerService.createCustomer(customer);
 
+            // Also create PanacheModel version
+            CustomerQueryPanacheModel panacheCustomer = new CustomerQueryPanacheModel();
+            panacheCustomer.customerId = event.getCustomerId();
+            panacheCustomer.name = event.getName();
+            panacheCustomer.email = event.getEmail();
+            panacheCustomer.address = event.getAddress();
+            panacheCustomer.birthDate = event.getBirthDate();
+            customerServicePanache.createCustomer(panacheCustomer);
+
             logger.info("Successfully processed CustomerCreated event for customer: " + event.getCustomerId());
         } catch (Exception e) {
             logger.severe("Error processing CustomerCreated event: " + e.getMessage());
@@ -90,5 +106,30 @@ public class CustomerProjection implements Projection {
 
     public CustomerQueryModel getCustomerById(String customerId) {
         return customerService.getCustomerById(customerId);
+    }
+    
+    // GetCustomers mit optionalem Namen
+    public List<GetCustomerDTO> getCustomers(String name) {
+        List<CustomerQueryPanacheModel> customers;
+        
+        if (name == null || name.trim().isEmpty()) {
+            customers = customerServicePanache.getAllCustomers();
+        } else {
+            customers = customerServicePanache.searchCustomersByName(name);
+        }
+        
+        return convertToCustomerDTO(customers);
+    }
+    
+    private List<GetCustomerDTO> convertToCustomerDTO(List<CustomerQueryPanacheModel> customers) {
+        return customers.stream()
+            .map(customer -> new GetCustomerDTO(
+                customer.customerId,
+                customer.name,
+                customer.email,
+                customer.address,
+                customer.birthDate
+            ))
+            .collect(Collectors.toList());
     }
 }
